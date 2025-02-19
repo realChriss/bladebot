@@ -7,6 +7,7 @@ services:
     volumes:
       - ./:/home/pro/bladebot
     restart: "no"
+  # Add as many bots as you want by copying the following block
   clan:
     container_name: clan-name
     image: node:20.18.0
