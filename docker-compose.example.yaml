@@ -1,0 +1,25 @@
+services:
+  builder:
+    image: node:20.18.0
+    container_name: bladebot-builder
+    working_dir: /home/pro/bladebot
+    command: ["sh", "docker/build.sh"]
+    volumes:
+      - ./:/home/pro/bladebot
+    restart: "no"
+  clan:
+    container_name: clan-name
+    image: node:20.18.0
+    working_dir: /home/pro/bladebot
+    restart: unless-stopped
+    command: ["sh", "docker/start.sh"]
+    network_mode: host
+    env_file:
+      - env/clan.env
+    environment:
+      - STATE=prod
+    volumes:
+      - ./:/home/pro/bladebot
+    depends_on:
+      builder:
+        condition: service_completed_successfully
