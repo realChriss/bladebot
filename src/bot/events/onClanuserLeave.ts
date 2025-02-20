@@ -38,9 +38,9 @@ const event: ClientEvent = {
       {
         state: EMessageReplyState.none,
       },
-    ).getEmbed();
+    );
 
-    await applicationChannel.send({ embeds: [embed] });
+    await embed.sendMessage();
   },
 };
 
