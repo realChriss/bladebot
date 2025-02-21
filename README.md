@@ -11,7 +11,7 @@ BladeBot is a Discord bot designed for BladeBall clan-servers to manage user app
   Provides commands to issue warnings for unmet AP or donation requirements. Each warn is recorded in the database and users are notified through direct messages. Check out the [`warn`](src/bot/slash/warn.ts) command for details.
 
 - **Interactive Slash Commands**  
-  Supports a range of slash commands such as `/ping` for latency checks, `/open` and `/close` for toggling application availability, and `/embed` for sending application embeds. The commands are built with [Discord.js](https://discord.js.org) and managed via [`ClientSlash`](src/bot/classes/ClientSlash.ts).
+  Supports a range of slash commands such as `/ping` for latency checks, `/open` and `/close` for toggling application availability, and `/embed` for sending application embeds.
 
 - **Role & Invite Management**  
   Automatically assigns clan roles upon application acceptance, updates application statuses, and manages pending invites through interactive buttons. Refer to [`applicationAction`](src/bot/events/applicationAction.ts) and [`inviteSend`](src/bot/events/inviteSend.ts) for more details.
