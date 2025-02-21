@@ -70,7 +70,7 @@ const event: ClientEvent = {
       const embedContent = {
         title: "You have been accepted",
         description: `You are now a part of **${process.env.CLAN_NAME}**`,
-        footerText: "You will be added to the Bladeball clan shorty",
+        footerText: "You will be added to the Bladeball clan shortly",
       };
 
       const embed = new MessageSender(
