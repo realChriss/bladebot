@@ -79,7 +79,7 @@ const event: ClientEvent = {
         { state: EMessageReplyState.success },
       ).getEmbed();
 
-      await appliedMember.createDM();
+      await appliedMember.createDM().catch(() => null);
 
       await appliedMember.dmChannel
         ?.send({ embeds: [embed] })
@@ -205,7 +205,7 @@ const event: ClientEvent = {
         footerText: "Create a ticket for more information",
       };
 
-      await appliedMember.createDM();
+      await appliedMember.createDM().catch(() => null);
       const embed = new MessageSender(
         interaction.channel as SendableChannels,
         embedContent,
@@ -264,7 +264,7 @@ const event: ClientEvent = {
         color: 0xf49f00,
       };
 
-      await appliedMember.createDM();
+      await appliedMember.createDM().catch(() => null);
       const embed = new MessageSender(
         interaction.channel as SendableChannels,
         embedContent,

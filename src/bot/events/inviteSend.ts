@@ -58,7 +58,7 @@ const event: ClientEvent = {
         { state: EMessageReplyState.success },
       ).getEmbed();
 
-      await appliedMember.createDM();
+      await appliedMember.createDM().catch(() => null);
 
       await appliedMember.dmChannel
         ?.send({ embeds: [embed] })

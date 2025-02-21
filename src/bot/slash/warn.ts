@@ -65,7 +65,7 @@ async function apWarnExec(interaction: ChatInputCommandInteraction) {
     },
   );
 
-  await member.createDM();
+  await member.createDM().catch(() => null);
   await member.dmChannel
     ?.send({ embeds: [warnEmbed.getEmbed()] })
     .catch(async () => {
@@ -155,7 +155,7 @@ async function donationWarnExec(interaction: ChatInputCommandInteraction) {
     },
   );
 
-  await member.createDM();
+  await member.createDM().catch(() => null);
   await member.dmChannel
     ?.send({ embeds: [warnEmbed.getEmbed()] })
     .catch(async () => {
