@@ -340,16 +340,11 @@ async function warnListExec(interaction: ChatInputCommandInteraction) {
 
   table.sort(["Warns|des"]);
 
-  const embedDescription =
-    warns.length > 0
-      ? `\`\`\`\n${table.toString()}\n\`\`\`\n_Only members with the Clan role are displayed_`
-      : "No warns found";
-
   const embed = new MessageSender(
     null,
     {
       title: "Warn list",
-      description: embedDescription,
+      description: `\`\`\`\n${table.toString()}\n\`\`\`\n_Only members with the Clan role are displayed_`,
       footerText: interaction.member?.user.username,
       color: 0xffffff,
     },
