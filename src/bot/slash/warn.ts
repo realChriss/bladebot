@@ -9,7 +9,6 @@ import { EMessageReplyState } from "../types/MsgReplyState";
 import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Table from "easy-table";
-import { toNamespacedPath } from "node:path";
 
 async function apWarnExec(interaction: ChatInputCommandInteraction) {
   const member = interaction.guild?.members.resolve(
