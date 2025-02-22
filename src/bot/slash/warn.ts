@@ -9,6 +9,7 @@ import { EMessageReplyState } from "../types/MsgReplyState";
 import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Table from "easy-table";
+import { toNamespacedPath } from "node:path";
 
 async function apWarnExec(interaction: ChatInputCommandInteraction) {
   const member = interaction.guild?.members.resolve(
@@ -339,12 +340,19 @@ async function warnListExec(interaction: ChatInputCommandInteraction) {
   });
 
   table.sort(["Warns|des"]);
+  
+  const warnLength = table.columns().length;
+
+  const embedDescription =
+    warnLength > 0
+      ? `\`\`\`\n${table.toString()}\n\`\`\`\n_Only members with the Clan role are displayed_`
+      : "No warns found";
 
   const embed = new MessageSender(
     null,
     {
       title: "Warn list",
-      description: `\`\`\`\n${table.toString()}\n\`\`\`\n_Only members with the Clan role are displayed_`,
+      description: embedDescription,
       footerText: interaction.member?.user.username,
       color: 0xffffff,
     },
