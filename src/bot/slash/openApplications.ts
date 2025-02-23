@@ -13,7 +13,7 @@ const command: ClientSlash = {
     .setName("open")
     .setDescription("Enables applications"),
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
-    await ConfigManager.openApp();
+    await ConfigManager.setAppOpen(true);
 
     const response = new MessageSender(
       null,

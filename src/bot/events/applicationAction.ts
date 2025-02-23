@@ -11,6 +11,7 @@ import MessageSender from "../classes/MessageSender";
 import { EMessageReplyState } from "../types/MsgReplyState";
 import Logger from "../../utils/Logger";
 import { TMessageReplyPayload } from "../types/MsgReplyPayload";
+import ConfigManager from "../../utils/ConfigManager";
 
 async function getApplication(interaction: ButtonInteraction) {
   const application = await prisma.application.findFirst({
@@ -65,6 +66,13 @@ const event: ClientEvent = {
         return;
       }
 
+      const mainChat = interaction.guild?.channels.cache.get(
+        process.env.MAIN_CHANNEL!,
+      );
+      if (!mainChat || !mainChat.isSendable()) {
+        Logger.error("Main chat not found");
+      }
+
       await appliedMember.roles.add(process.env.CLAN_ROLE!);
 
       const embedContent = {
@@ -84,11 +92,7 @@ const event: ClientEvent = {
       await appliedMember.dmChannel
         ?.send({ embeds: [embed] })
         .catch(async () => {
-          const mainChat = interaction.guild?.channels.cache.get(
-            process.env.MAIN_CHANNEL!,
-          );
           if (!mainChat) {
-            Logger.error("Main chat not found");
             return;
           }
 
@@ -160,20 +164,40 @@ const event: ClientEvent = {
         },
       });
 
+      const displayName = appliedMember.displayName;
       const nickname = `${appliedMember.user.globalName || appliedMember.user.username} (${application.roblox_user})`;
+
       if (nickname.length <= 32) {
         await appliedMember.setNickname(nickname);
       } else {
         const nicknameError = new MessageSender(
           interaction.channel as SendableChannels,
           {
-            description: `New nickname for \`${appliedMember.displayName}\` is longer than 32 chars`,
+            description: `New nickname for \`${displayName}\` is longer than 32 chars`,
           },
           {
             state: EMessageReplyState.error,
           },
         );
         await nicknameError.sendMessage();
+      }
+
+      if (
+        mainChat &&
+        mainChat.isSendable() &&
+        (await ConfigManager.isWlcMsgOn())
+      ) {
+        await new MessageSender(
+          mainChat,
+          {
+            authorImg: appliedMember.user.displayAvatarURL(),
+            authorName: displayName,
+            title: `Welcome ${displayName}`,
+            description: `Say hello to **${displayName}**!`,
+            thumbnail: application.roblox_headshot_url || undefined,
+          },
+          { state: EMessageReplyState.success },
+        ).sendMessage();
       }
     } else if (interaction.customId === "application_reject") {
       await interaction.deferReply();

@@ -5,9 +5,5 @@ CREATE TABLE public.user_warn (id SERIAL NOT NULL, user_id varchar NOT NULL, req
 CREATE INDEX idx_user_warn_type ON public.user_warn USING btree (warn_type_id);
 CREATE INDEX idx_user_warn_userid ON public.user_warn USING btree (user_id);
 CREATE TABLE public.application (user_id varchar NOT NULL, msg_id varchar NOT NULL, discord_user varchar, roblox_user varchar, roblox_avatar_url varchar, roblox_headshot_url varchar, pending_msg_id varchar, age integer, kill integer, win integer, PRIMARY KEY(user_id, msg_id));
-CREATE TABLE public.config (id integer NOT NULL, app_open boolean, PRIMARY KEY(id));
-INSERT INTO public.config (id, app_open) VALUES (1, TRUE);
-DROP FUNCTION IF EXISTS public.close_applications;
-CREATE OR REPLACE FUNCTION public.close_applications() RETURNS void LANGUAGE plpgsql AS $$ BEGIN UPDATE public.config SET app_open = FALSE WHERE id = 1; END; $$;
-DROP FUNCTION IF EXISTS public.open_applications;
-CREATE OR REPLACE FUNCTION public.open_applications() RETURNS void LANGUAGE plpgsql AS $$ BEGIN UPDATE public.config SET app_open = TRUE WHERE id = 1; END; $$;
+CREATE TABLE public.config (id integer NOT NULL, app_open boolean, send_wlc_msg PRIMARY KEY(id));
+INSERT INTO public.config (id, app_open, send_wlc_msg) VALUES (1, TRUE, FALSE);

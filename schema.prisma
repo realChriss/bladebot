@@ -52,4 +52,5 @@ model user_warn {
 model config {
   id              Int @id
   app_open        Boolean?
+  send_wlc_msg    Boolean?
 }

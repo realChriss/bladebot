@@ -15,7 +15,7 @@ const command: ClientSlash = {
     .setName("close")
     .setDescription("Disables applications"),
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
-    await ConfigManager.closeApp();
+    await ConfigManager.setAppOpen(false);
 
     const response = new MessageSender(
       null,

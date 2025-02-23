@@ -276,7 +276,7 @@ const event: ClientEvent = {
           },
         });
 
-        const response = (await ConfigManager.appIsOpen())
+        const response = (await ConfigManager.isAppOpen())
           ? "✅ Success! Please wait for an answer from this bot.\nPlease make sure that this bot is able to send you a DM."
           : "✅ Success! Applications are currently closed.\nYou are placed on the **waitlist**";
 
