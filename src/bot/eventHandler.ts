@@ -47,7 +47,7 @@ export default class EventHandler {
         ) {
           lockKey = (interaction.message?.id ?? interaction.customId) as string;
 
-          if (!InteractionLocker.lock(lockKey)) {
+          if (InteractionLocker.lock(lockKey) === false) {
             if (!interaction.deferred && !interaction.replied) {
               await interaction.reply({
                 ephemeral: true,
