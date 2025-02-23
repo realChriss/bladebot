@@ -45,11 +45,7 @@ export default class EventHandler {
           interaction?.customId &&
           InteractionLocker.requiresLock(interaction.customId)
         ) {
-          lockKey = interaction.message?.id ?? interaction.customId;
-
-          if (!lockKey) {
-            return;
-          }
+          lockKey = (interaction.message?.id ?? interaction.customId) as string;
 
           if (!InteractionLocker.lock(lockKey)) {
             if (!interaction.deferred && !interaction.replied) {
