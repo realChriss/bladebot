@@ -339,7 +339,7 @@ async function warnListExec(interaction: ChatInputCommandInteraction) {
   });
 
   table.sort(["Warns|des"]);
-  
+
   const warnLength = table.columns().length;
 
   const embedDescription =
