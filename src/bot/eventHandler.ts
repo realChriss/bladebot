@@ -9,6 +9,7 @@ const lockableCustomIds = [
   "application_accept",
   "application_reject",
   "application_delete",
+  "application_verify_and_waitlist",
   "clan_invite_sent",
 ];
 
