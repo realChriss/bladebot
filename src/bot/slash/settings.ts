@@ -9,7 +9,6 @@ import ClientSlash from "../classes/ClientSlash";
 import ConfigManager from "../../utils/ConfigManager";
 import MessageSender from "../classes/MessageSender";
 import { EMessageReplyState } from "../types/MsgReplyState";
-import { stat } from "fs";
 
 async function reply(
   integraton: ChatInputCommandInteraction,
