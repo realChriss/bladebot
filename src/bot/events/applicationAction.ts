@@ -81,11 +81,9 @@ const event: ClientEvent = {
         footerText: "You will be added to the Bladeball clan shortly",
       };
 
-      const embed = new MessageSender(
-        null,
-        embedContent,
-        { state: EMessageReplyState.success },
-      ).getEmbed();
+      const embed = new MessageSender(null, embedContent, {
+        state: EMessageReplyState.success,
+      }).getEmbed();
 
       await appliedMember.createDM().catch(() => null);
 
@@ -233,16 +231,16 @@ const event: ClientEvent = {
       };
 
       await appliedMember.createDM().catch(() => null);
-      const embed = new MessageSender(
-        null,
-        embedContent,
-        { state: EMessageReplyState.error },
-      ).getEmbed();
+      const embed = new MessageSender(null, embedContent, {
+        state: EMessageReplyState.error,
+      }).getEmbed();
 
       await appliedMember.dmChannel?.send({ embeds: [embed] }).catch(() => {
-        Logger.warn(
-          `Could not DM ${appliedMember.user.username} for rejection`,
-        );
+        const error = `Could not DM ${appliedMember.user.username} for rejection`;
+        if (interaction.channel?.isSendable()) {
+          interaction.channel.send(error);
+        }
+        Logger.warn(error);
       });
 
       await interaction.editReply(
@@ -292,11 +290,9 @@ const event: ClientEvent = {
       };
 
       await appliedMember.createDM().catch(() => null);
-      const embed = new MessageSender(
-        null,
-        embedContent,
-        { state: EMessageReplyState.none },
-      ).getEmbed();
+      const embed = new MessageSender(null, embedContent, {
+        state: EMessageReplyState.none,
+      }).getEmbed();
 
       await appliedMember.dmChannel?.send({ embeds: [embed] }).catch(() => {
         Logger.warn(`Could not DM ${appliedMember.user.username}`);
