@@ -14,8 +14,8 @@ async function apWarnExec(interaction: ChatInputCommandInteraction) {
   const member = interaction.guild?.members.resolve(
     interaction.options.getUser("target")!.id,
   );
-  const apRequirement = interaction.options.getInteger("ap_requirement")!;
-  const apEarned = interaction.options.getInteger("ap_earned")!;
+  const apRequirement = interaction.options.getInteger("ap-requirement")!;
+  const apEarned = interaction.options.getInteger("ap-earned")!;
 
   if (!member) {
     await interaction.reply({
@@ -103,7 +103,7 @@ async function donationWarnExec(interaction: ChatInputCommandInteraction) {
     interaction.options.getUser("target")!.id,
   );
   const donationRequirement = interaction.options.getInteger(
-    "donation_requirement",
+    "donation-requirement",
   )!;
   const donated = interaction.options.getInteger("donated")!;
 
@@ -271,7 +271,7 @@ async function showWarnExec(interaction: ChatInputCommandInteraction) {
 }
 
 async function warnRemoveExec(interaction: ChatInputCommandInteraction) {
-  const warnId = interaction.options.getInteger("warn_id")!;
+  const warnId = interaction.options.getInteger("warn-id")!;
 
   let res: MessageSender;
 
@@ -381,13 +381,13 @@ const command: ClientSlash = {
         )
         .addIntegerOption((option) =>
           option
-            .setName("ap_requirement")
+            .setName("ap-requirement")
             .setDescription("The current AP requirement")
             .setRequired(true),
         )
         .addIntegerOption((option) =>
           option
-            .setName("ap_earned")
+            .setName("ap-earned")
             .setDescription("The AP the user earned")
             .setRequired(true),
         ),
@@ -404,7 +404,7 @@ const command: ClientSlash = {
         )
         .addIntegerOption((option) =>
           option
-            .setName("donation_requirement")
+            .setName("donation-requirement")
             .setDescription("The current Donation requirement")
             .setRequired(true),
         )
@@ -432,7 +432,7 @@ const command: ClientSlash = {
         .setDescription("Removes a warn")
         .addIntegerOption((option) =>
           option
-            .setName("warn_id")
+            .setName("warn-id")
             .setDescription("The ID of the warn")
             .setRequired(true),
         ),
