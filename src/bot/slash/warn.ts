@@ -97,6 +97,8 @@ async function apWarnExec(interaction: ChatInputCommandInteraction) {
   const res = new MessageSender(
     null,
     {
+      authorImg: member.displayAvatarURL(),
+      authorName: member.displayName,
       title: `${member.displayName} was warned`,
       description: `**Warn Info:**\nWarn type: AP\nAP Requirement: ${apRequirement}\nAP Earned: ${apEarned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: interaction.member?.user.username,
@@ -174,6 +176,8 @@ async function donationWarnExec(interaction: ChatInputCommandInteraction) {
   const res = new MessageSender(
     null,
     {
+      authorImg: member.displayAvatarURL(),
+      authorName: member.displayName,
       title: `${member.displayName} was warned`,
       description: `**Warn Info:**\nWarn type: Donation\nDonation Requirement: ${donationRequirement}\nAmount Donated: ${donated}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: interaction.member?.user.username,
@@ -247,6 +251,8 @@ async function showWarnExec(interaction: ChatInputCommandInteraction) {
   const res = new MessageSender(
     null,
     {
+      authorImg: member.displayAvatarURL(),
+      authorName: member.displayName,
       title: `Warns of ${member.displayName}`,
       description:
         (apWarnCount < 1
@@ -284,19 +290,21 @@ async function warnRemoveExec(interaction: ChatInputCommandInteraction) {
     .then(async (warn) => {
       const member = interaction.guild?.members.cache.get(warn.user_id);
 
-      res = new MessageSender(
+      const embed = new MessageSender(
         null,
         {
+          authorImg: member?.displayAvatarURL(),
+          authorName: member?.displayName,
           description: `Warn **#${warnId}** was removed from **${member?.displayName || "Unknown"}**.`,
           footerText: interaction.member?.user.username,
         },
         {
           state: EMessageReplyState.success,
         },
-      );
+      ).getEmbed();
 
       await interaction.reply({
-        embeds: [res.getEmbed()],
+        embeds: [embed],
       });
     })
     .catch(async () => {
