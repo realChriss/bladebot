@@ -19,8 +19,8 @@ const event: ClientEvent = {
 
     const applicationChannel = member.guild.channels.cache.get(
       process.env.APPLICATION_CHANNEL!,
-    ) as GuildTextBasedChannel | undefined;
-    if (!applicationChannel) {
+    );
+    if (!applicationChannel || !applicationChannel.isSendable()) {
       Logger.error("Application channel not found");
       return;
     }

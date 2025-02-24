@@ -82,7 +82,7 @@ const event: ClientEvent = {
       };
 
       const embed = new MessageSender(
-        interaction.channel as SendableChannels,
+        null,
         embedContent,
         { state: EMessageReplyState.success },
       ).getEmbed();
@@ -174,7 +174,7 @@ const event: ClientEvent = {
           );
         });
       } else {
-        const nicknameError = new MessageSender(
+        await new MessageSender(
           interaction.channel as SendableChannels,
           {
             description: `New nickname for \`${displayName}\` is longer than 32 chars`,
@@ -182,8 +182,7 @@ const event: ClientEvent = {
           {
             state: EMessageReplyState.error,
           },
-        );
-        await nicknameError.sendMessage();
+        ).sendMessage();
       }
 
       if (
@@ -235,7 +234,7 @@ const event: ClientEvent = {
 
       await appliedMember.createDM().catch(() => null);
       const embed = new MessageSender(
-        interaction.channel as SendableChannels,
+        null,
         embedContent,
         { state: EMessageReplyState.error },
       ).getEmbed();
@@ -294,7 +293,7 @@ const event: ClientEvent = {
 
       await appliedMember.createDM().catch(() => null);
       const embed = new MessageSender(
-        interaction.channel as SendableChannels,
+        null,
         embedContent,
         { state: EMessageReplyState.none },
       ).getEmbed();

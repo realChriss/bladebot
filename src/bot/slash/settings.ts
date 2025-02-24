@@ -1,9 +1,7 @@
 import {
   ChatInputCommandInteraction,
   Client,
-  SendableChannels,
   SlashCommandBuilder,
-  TextBasedChannel,
 } from "discord.js";
 import ClientSlash from "../classes/ClientSlash";
 import ConfigManager from "../../utils/ConfigManager";
