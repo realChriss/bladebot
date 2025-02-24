@@ -10,13 +10,54 @@ import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Table from "easy-table";
 
-async function getWarnCount(userId: string) {
+interface WarnConfig {
+  warnTypeId: number;
+  warnTypeName: string;
+  requirementOptionName: string;
+  earnedOptionName: string;
+  requirementLabel: string;
+  earnedLabel: string;
+}
+
+interface Warn {
+  id: number;
+  user_id: string;
+  issuer_id: string;
+  requirement: number;
+  earned: number;
+  diff: number | null;
+  created_at: Date | string;
+  warn_type_id: number;
+}
+
+const warnTypeData: Record<
+  number,
+  {
+    label: string;
+    requirementLabel: string;
+    earnedLabel: string;
+    diffLabel: string;
+  }
+> = {
+  1: {
+    label: "AP",
+    requirementLabel: "AP Requirement",
+    earnedLabel: "AP Earned",
+    diffLabel: "Diff",
+  },
+  2: {
+    label: "Donation",
+    requirementLabel: "Donation Requirement",
+    earnedLabel: "Amount Donated",
+    diffLabel: "Diff",
+  },
+};
+
+async function getWarnCounts(userId: string) {
   const warnCounts = await prisma.user_warn.groupBy({
     by: ["warn_type_id"],
     _count: { warn_type_id: true },
-    where: {
-      user_id: userId,
-    },
+    where: { user_id: userId },
   });
 
   const counts = warnCounts.reduce(
@@ -27,25 +68,60 @@ async function getWarnCount(userId: string) {
     {} as Record<number, number>,
   );
 
-  const apWarnCount = counts[1] ?? 0;
-  const donationWarnCount = counts[2] ?? 0;
-
   return {
-    apWarnCount,
-    donationWarnCount,
+    apWarnCount: counts[1] ?? 0,
+    donationWarnCount: counts[2] ?? 0,
   };
 }
 
-async function apWarnExec(interaction: ChatInputCommandInteraction) {
-  const member = interaction.guild?.members.resolve(
-    interaction.options.getUser("target")!.id,
-  );
-  const apRequirement = interaction.options.getInteger("ap-requirement")!;
-  const apEarned = interaction.options.getInteger("ap-earned")!;
+async function resolveTargetMember(interaction: ChatInputCommandInteraction) {
+  const targetUser = interaction.options.getUser("target");
+  if (!targetUser) return null;
+  return interaction.guild?.members.resolve(targetUser.id) ?? null;
+}
 
+async function sendDMorFallback(
+  member: any,
+  dmEmbed: MessageSender,
+  fallbackChannel: SendableChannels,
+) {
+  try {
+    const dmChannel = await member.createDM();
+    await dmChannel.send({ embeds: [dmEmbed.getEmbed()] });
+  } catch (error) {
+    const fallback = new MessageSender(
+      fallbackChannel,
+      {
+        title: "DM Failure",
+        description: `Could not send a DM to **${member.displayName}**.\nPlease contact the user about the warn.`,
+      },
+      { state: EMessageReplyState.error },
+    );
+    await fallback.sendMessage();
+  }
+}
+
+async function createAndNotifyWarn(
+  interaction: ChatInputCommandInteraction,
+  config: WarnConfig,
+) {
+  const member = await resolveTargetMember(interaction);
   if (!member) {
     await interaction.reply({
       content: "Member not found",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  const requirement = interaction.options.getInteger(
+    config.requirementOptionName,
+  )!;
+  const earned = interaction.options.getInteger(config.earnedOptionName)!;
+
+  if (earned >= requirement) {
+    await interaction.reply({
+      content: "The earned value must be less than the requirement",
       ephemeral: true,
     });
     return;
@@ -57,146 +133,70 @@ async function apWarnExec(interaction: ChatInputCommandInteraction) {
     data: {
       user_id: member.id,
       issuer_id: interaction.member?.user.id!,
-      requirement: apRequirement,
-      earned: apEarned,
-      warn_type_id: 1,
+      requirement: requirement,
+      earned: earned,
+      warn_type_id: config.warnTypeId,
     },
   });
 
-  const { apWarnCount, donationWarnCount } = await getWarnCount(member.id);
+  const { apWarnCount, donationWarnCount } = await getWarnCounts(member.id);
 
-  const warnEmbed = new MessageSender(
+  const dmEmbed = new MessageSender(
     null,
     {
       authorName: process.env.CLAN_NAME,
       title: "Warned",
-      description: `You have been warned for not meeting the AP requirement.\n\n**Warn Information:**\nAP Requirement: ${apRequirement}\nAP Earned: ${apEarned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
+      description: `You have been warned for not meeting the ${config.warnTypeName} requirement.\n\n**Warn Information:**\n${config.requirementLabel}: ${requirement}\n${config.earnedLabel}: ${earned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: "Open a ticket for more information",
     },
-    {
-      state: EMessageReplyState.error,
-    },
+    { state: EMessageReplyState.error },
   );
 
-  await member.createDM().catch(() => null);
-  await member.dmChannel
-    ?.send({ embeds: [warnEmbed.getEmbed()] })
-    .catch(async () => {
-      await new MessageSender(
-        interaction.channel as SendableChannels,
-        {
-          title: "DM Failure",
-          description: `Could not send a DM to **${member.displayName}**.\nPlease contact the user about the warn`,
-        },
-        {
-          state: EMessageReplyState.error,
-        },
-      ).sendMessage();
-    });
+  await sendDMorFallback(
+    member,
+    dmEmbed,
+    interaction.channel as SendableChannels,
+  );
 
-  const res = new MessageSender(
+  const channelEmbed = new MessageSender(
     null,
     {
       authorImg: member.displayAvatarURL(),
       authorName: member.displayName,
       title: `${member.displayName} was warned`,
-      description: `**Warn Info:**\nWarn type: AP\nAP Requirement: ${apRequirement}\nAP Earned: ${apEarned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
+      description: `**Warn Info:**\nWarn type: ${config.warnTypeName}\n${config.requirementLabel}: ${requirement}\n${config.earnedLabel}: ${earned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: interaction.member?.user.username,
     },
-    {
-      state: EMessageReplyState.success,
-    },
+    { state: EMessageReplyState.success },
   );
 
-  await interaction.editReply({
-    embeds: [res.getEmbed()],
+  await interaction.editReply({ embeds: [channelEmbed.getEmbed()] });
+}
+
+async function apWarnExec(interaction: ChatInputCommandInteraction) {
+  await createAndNotifyWarn(interaction, {
+    warnTypeId: 1,
+    warnTypeName: "AP",
+    requirementOptionName: "ap-requirement",
+    earnedOptionName: "ap-earned",
+    requirementLabel: "AP Requirement",
+    earnedLabel: "AP Earned",
   });
 }
 
 async function donationWarnExec(interaction: ChatInputCommandInteraction) {
-  const member = interaction.guild?.members.resolve(
-    interaction.options.getUser("target")!.id,
-  );
-  const donationRequirement = interaction.options.getInteger(
-    "donation-requirement",
-  )!;
-  const donated = interaction.options.getInteger("donated")!;
-
-  if (!member) {
-    await interaction.reply({
-      content: "Member not found",
-      ephemeral: true,
-    });
-    return;
-  }
-
-  await interaction.deferReply();
-
-  const warn = await prisma.user_warn.create({
-    data: {
-      user_id: member.id,
-      issuer_id: interaction.member?.user.id!,
-      requirement: donationRequirement,
-      earned: donated,
-      warn_type_id: 2,
-    },
-  });
-
-  const { apWarnCount, donationWarnCount } = await getWarnCount(member.id);
-
-  const warnEmbed = new MessageSender(
-    null,
-    {
-      authorName: process.env.CLAN_NAME,
-      title: "Warned",
-      description: `You have been warned for not meeting the Donation requirement.\n\n**Warn Information:**\nDonation Requirement: ${donationRequirement}\nAmount Donated: ${donated}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
-      footerText: "Open a ticket for more information",
-    },
-    {
-      state: EMessageReplyState.error,
-    },
-  );
-
-  await member.createDM().catch(() => null);
-  await member.dmChannel
-    ?.send({ embeds: [warnEmbed.getEmbed()] })
-    .catch(async () => {
-      await new MessageSender(
-        interaction.channel as SendableChannels,
-        {
-          title: "DM Failure",
-          description: `Could not send a DM to **${member.displayName}**.\nPlease contact the user about the warn`,
-        },
-        {
-          state: EMessageReplyState.error,
-        },
-      ).sendMessage();
-    });
-
-  const res = new MessageSender(
-    null,
-    {
-      authorImg: member.displayAvatarURL(),
-      authorName: member.displayName,
-      title: `${member.displayName} was warned`,
-      description: `**Warn Info:**\nWarn type: Donation\nDonation Requirement: ${donationRequirement}\nAmount Donated: ${donated}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
-      footerText: interaction.member?.user.username,
-    },
-    {
-      state: EMessageReplyState.success,
-    },
-  );
-
-  await interaction.editReply({
-    embeds: [res.getEmbed()],
+  await createAndNotifyWarn(interaction, {
+    warnTypeId: 2,
+    warnTypeName: "Donation",
+    requirementOptionName: "donation-requirement",
+    earnedOptionName: "donated",
+    requirementLabel: "Donation Requirement",
+    earnedLabel: "Amount Donated",
   });
 }
 
 async function showWarnExec(interaction: ChatInputCommandInteraction) {
-  const member = interaction.guild?.members.resolve(
-    interaction.options.getUser("target")!.id,
-  );
-
+  const member = await resolveTargetMember(interaction);
   if (!member) {
     await interaction.reply({
       content: "Member not found",
@@ -206,140 +206,109 @@ async function showWarnExec(interaction: ChatInputCommandInteraction) {
   }
 
   const warns = await prisma.user_warn.findMany({
-    where: {
-      user_id: member.id,
-    },
+    where: { user_id: member.id },
   });
 
-  const apWarnCount = warns.filter((x) => x.warn_type_id === 1).length;
-  const donationWarnCount = warns.filter((x) => x.warn_type_id === 2).length;
+  const apWarnCount = warns.filter((w) => w.warn_type_id === 1).length;
+  const donationWarnCount = warns.filter((w) => w.warn_type_id === 2).length;
 
-  const fields =
-    warns.map((warn) => {
-      const createdAtTimestamp = Math.floor(
-        new Date(warn.created_at).getTime() / 1000,
-      );
-      const issuer = interaction.guild?.members.cache.get(warn.issuer_id);
+  const buildWarnField = (
+    warn: Warn,
+  ): { name: string; value: string; inline: boolean } => {
+    const createdAtTimestamp = Math.floor(
+      new Date(warn.created_at).getTime() / 1000,
+    );
+    const issuer = interaction.guild?.members.cache.get(warn.issuer_id);
+    const issuerName = issuer?.user.username || "Unknown";
 
-      if (warn.warn_type_id === 1) {
-        return {
-          name: `__AP Warn #${warn.id}__`,
-          value:
-            `**Warn Type:** AP\n` +
-            `**AP Requirement:** ${warn.requirement}\n` +
-            `**AP Earned:** ${warn.earned}\n` +
-            `**AP Diff:** ${warn.diff}\n` +
-            `**Issuer:** ${issuer?.user.username || "Unknown"}\n` +
-            `**Created At:** <t:${createdAtTimestamp}:f>`,
-          inline: true,
-        };
-      } else {
-        return {
-          name: `__Donation Warn #${warn.id}__`,
-          value:
-            `**Warn Type:** Donation\n` +
-            `**Donation Requirement:** ${warn.requirement}\n` +
-            `**Amount Donated:** ${warn.earned}\n` +
-            `**Diff:** ${warn.diff}\n` +
-            `**Issuer:** ${issuer?.user.username || "Unknown"}\n` +
-            `**Created At:** <t:${createdAtTimestamp}:f>`,
-          inline: true,
-        };
-      }
-    }) || undefined;
+    const data = warnTypeData[warn.warn_type_id] || warnTypeData[1];
 
-  const res = new MessageSender(
+    return {
+      name: `__${data.label} Warn #${warn.id}__`,
+      value: [
+        `**Warn Type:** ${data.label}`,
+        `**${data.requirementLabel}:** ${warn.requirement}`,
+        `**${data.earnedLabel}:** ${warn.earned}`,
+        `**${data.diffLabel}:** ${warn.diff !== null ? warn.diff : "N/A"}`,
+        `**Issuer:** ${issuerName}`,
+        `**Created At:** <t:${createdAtTimestamp}:f>`,
+      ].join("\n"),
+      inline: true,
+    };
+  };
+
+  const fields = warns.map(buildWarnField);
+
+  const description = [
+    apWarnCount < 1
+      ? "This user has no AP warns."
+      : `This user has ${apWarnCount} AP warns.`,
+    donationWarnCount < 1
+      ? "This user has no Donation warns."
+      : `This user has ${donationWarnCount} Donation warns.`,
+  ].join("\n");
+
+  const embed = new MessageSender(
     null,
     {
       authorImg: member.displayAvatarURL(),
       authorName: member.displayName,
       title: `Warns of ${member.displayName}`,
-      description:
-        (apWarnCount < 1
-          ? "This user has no AP warns."
-          : `This user has ${apWarnCount} AP warns.`) +
-        "\n" +
-        (donationWarnCount < 1
-          ? "This user has no Donation warns."
-          : `This user has ${donationWarnCount} Donation warns.`),
-      fields: fields,
+      description,
+      fields,
       footerText: interaction.member?.user.username,
       color: 0xffffff,
     },
-    {
-      state: EMessageReplyState.none,
-    },
+    { state: EMessageReplyState.none },
   );
 
-  await interaction.reply({
-    embeds: [res.getEmbed()],
-  });
+  await interaction.reply({ embeds: [embed.getEmbed()] });
 }
 
 async function warnRemoveExec(interaction: ChatInputCommandInteraction) {
   const warnId = interaction.options.getInteger("warn-id")!;
 
-  let res: MessageSender;
-
   await prisma.user_warn
-    .delete({
-      where: {
-        id: warnId,
-      },
-    })
-    .then(async (warn) => {
+    .delete({ where: { id: warnId } })
+    .then((warn) => {
       const member = interaction.guild?.members.cache.get(warn.user_id);
-
       const embed = new MessageSender(
         null,
         {
-          authorImg: member?.displayAvatarURL(),
+          authorImg: member ? member?.displayAvatarURL() : undefined,
           authorName: member?.displayName,
           description: `Warn **#${warnId}** was removed from **${member?.displayName || "Unknown"}**.`,
           footerText: interaction.member?.user.username,
         },
-        {
-          state: EMessageReplyState.success,
-        },
+        { state: EMessageReplyState.success },
       ).getEmbed();
 
-      await interaction.reply({
-        embeds: [embed],
-      });
+      return interaction.reply({ embeds: [embed] });
     })
-    .catch(async () => {
-      res = new MessageSender(
+    .catch(() => {
+      const res = new MessageSender(
         null,
         {
           description: `Warn **#${warnId}** was not found.`,
           footerText: interaction.member?.user.username,
         },
-        {
-          state: EMessageReplyState.error,
-        },
+        { state: EMessageReplyState.error },
       );
-
-      await interaction.reply({
-        embeds: [res.getEmbed()],
-      });
+      return interaction.reply({ embeds: [res.getEmbed()] });
     });
 }
 
 async function warnListExec(interaction: ChatInputCommandInteraction) {
   const warns = await prisma.user_warn.groupBy({
     by: ["user_id"],
-    _count: {
-      id: true,
-    },
+    _count: { id: true },
   });
 
   const table = new Table();
 
   warns.forEach((warn) => {
     const user = interaction.guild?.members.cache.get(warn.user_id);
-    if (!user || user?.roles.cache.has(process.env.CLAN_ROLE!) === false) {
-      return null;
-    }
+    if (!user || !user.roles.cache.has(process.env.CLAN_ROLE!)) return;
 
     table.cell("Username", user.displayName.replace(/`/g, "\\`"));
     table.cell("Warns", warn._count.id);
@@ -348,10 +317,8 @@ async function warnListExec(interaction: ChatInputCommandInteraction) {
 
   table.sort(["Warns|des"]);
 
-  const warnLength = table.columns().length;
-
   const embedDescription =
-    warnLength > 0
+    table.columns().length > 0
       ? `\`\`\`\n${table.toString()}\n\`\`\`\n_Only members with the Clan role are displayed_`
       : "No warns found";
 
@@ -363,14 +330,10 @@ async function warnListExec(interaction: ChatInputCommandInteraction) {
       footerText: interaction.member?.user.username,
       color: 0xffffff,
     },
-    {
-      state: EMessageReplyState.none,
-    },
+    { state: EMessageReplyState.none },
   );
 
-  await interaction.reply({
-    embeds: [embed.getEmbed()],
-  });
+  await interaction.reply({ embeds: [embed.getEmbed()] });
 }
 
 const command: ClientSlash = {
@@ -449,16 +412,22 @@ const command: ClientSlash = {
       subcommand.setName("list").setDescription("List all warn"),
     ) as SlashCommandBuilder,
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
-    if (interaction.options.getSubcommand() === "ap") {
-      await apWarnExec(interaction);
-    } else if (interaction.options.getSubcommand() === "donation") {
-      await donationWarnExec(interaction);
-    } else if (interaction.options.getSubcommand() === "show") {
-      await showWarnExec(interaction);
-    } else if (interaction.options.getSubcommand() === "remove") {
-      await warnRemoveExec(interaction);
-    } else if (interaction.options.getSubcommand() === "list") {
-      await warnListExec(interaction);
+    switch (interaction.options.getSubcommand()) {
+      case "ap":
+        await apWarnExec(interaction);
+        break;
+      case "donation":
+        await donationWarnExec(interaction);
+        break;
+      case "show":
+        await showWarnExec(interaction);
+        break;
+      case "remove":
+        await warnRemoveExec(interaction);
+        break;
+      case "list":
+        await warnListExec(interaction);
+        break;
     }
   },
   options: {
@@ -467,4 +436,5 @@ const command: ClientSlash = {
     allowStaff: true,
   },
 };
+
 export default command;
