@@ -25,7 +25,7 @@ async function fetchApplicationMessage(
 
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
-    .setName("pendingapplications")
+    .setName("list-applications")
     .setDescription("Shows all pending applications"),
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();

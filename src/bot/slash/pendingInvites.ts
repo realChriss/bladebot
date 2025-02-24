@@ -27,7 +27,7 @@ async function fetchInviteMessage(
 
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
-    .setName("pendinginvites")
+    .setName("list-invites")
     .setDescription("Shows all pending invites"),
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
