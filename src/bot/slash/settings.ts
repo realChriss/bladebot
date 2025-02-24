@@ -9,25 +9,43 @@ import MessageSender from "../classes/MessageSender";
 import { EMessageReplyState } from "../types/MsgReplyState";
 
 async function reply(
-  integraton: ChatInputCommandInteraction,
-  sucess: boolean,
+  interaction: ChatInputCommandInteraction,
+  success: boolean,
   content: string,
 ) {
   const embed = new MessageSender(
     null,
     {
       description: content,
-      footerText: integraton.user.username,
+      footerText: interaction.user.username,
     },
-    {
-      state: sucess ? EMessageReplyState.success : EMessageReplyState.error,
-    },
+    { state: success ? EMessageReplyState.success : EMessageReplyState.error },
   );
 
-  await integraton.reply({
-    embeds: [embed.getEmbed()],
-  });
+  await interaction.reply({ embeds: [embed.getEmbed()] });
 }
+
+const settingsMap: Record<
+  string,
+  { action: () => Promise<void>; message: string }
+> = {
+  open: {
+    action: () => ConfigManager.setAppOpen(true),
+    message: "Applications are now open",
+  },
+  close: {
+    action: () => ConfigManager.setAppOpen(false),
+    message: "Applications are now closed",
+  },
+  "enable-welcome": {
+    action: () => ConfigManager.setWlcMsg(true),
+    message: "Welcome message is now enabled",
+  },
+  "disable-welcome": {
+    action: () => ConfigManager.setWlcMsg(false),
+    message: "Welcome message is now disabled",
+  },
+};
 
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
@@ -50,18 +68,14 @@ const command: ClientSlash = {
         .setDescription("Disables welcome message"),
     ) as SlashCommandBuilder,
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
-    if (interaction.options.getSubcommand() === "open") {
-      await ConfigManager.setAppOpen(true);
-      await reply(interaction, true, "Applications are now open");
-    } else if (interaction.options.getSubcommand() === "close") {
-      await ConfigManager.setAppOpen(false);
-      await reply(interaction, true, "Applications are now closed");
-    } else if (interaction.options.getSubcommand() === "enable-welcome") {
-      await ConfigManager.setWlcMsg(true);
-      await reply(interaction, true, "Welcome message is now enabled");
-    } else if (interaction.options.getSubcommand() === "disable-welcome") {
-      await ConfigManager.setWlcMsg(false);
-      await reply(interaction, true, "Welcome message is now disabled");
+    const subcommand = interaction.options.getSubcommand();
+    const setting = settingsMap[subcommand];
+
+    if (setting) {
+      await setting.action();
+      await reply(interaction, true, setting.message);
+    } else {
+      await reply(interaction, false, "Invalid subcommand.");
     }
   },
   options: {
@@ -70,4 +84,5 @@ const command: ClientSlash = {
     allowStaff: true,
   },
 };
+
 export default command;
