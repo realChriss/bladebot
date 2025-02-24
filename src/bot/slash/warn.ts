@@ -56,8 +56,12 @@ const warnTypeData: Record<
 async function getWarnCounts(userId: string) {
   const warnCounts = await prisma.user_warn.groupBy({
     by: ["warn_type_id"],
-    _count: { warn_type_id: true },
-    where: { user_id: userId },
+    _count: {
+      warn_type_id: true,
+    },
+    where: {
+      user_id: userId,
+    },
   });
 
   const counts = warnCounts.reduce(
@@ -87,7 +91,9 @@ async function sendDMorFallback(
 ) {
   try {
     const dmChannel = await member.createDM();
-    await dmChannel.send({ embeds: [dmEmbed.getEmbed()] });
+    await dmChannel.send({
+      embeds: [dmEmbed.getEmbed()],
+    });
   } catch (error) {
     const fallback = new MessageSender(
       fallbackChannel,
@@ -170,7 +176,9 @@ async function createAndNotifyWarn(
     { state: EMessageReplyState.success },
   );
 
-  await interaction.editReply({ embeds: [channelEmbed.getEmbed()] });
+  await interaction.editReply({
+    embeds: [channelEmbed.getEmbed()],
+  });
 }
 
 async function apWarnExec(interaction: ChatInputCommandInteraction) {
@@ -206,7 +214,9 @@ async function showWarnExec(interaction: ChatInputCommandInteraction) {
   }
 
   const warns = await prisma.user_warn.findMany({
-    where: { user_id: member.id },
+    where: {
+      user_id: member.id,
+    },
   });
 
   const apWarnCount = warns.filter((w) => w.warn_type_id === 1).length;
@@ -262,14 +272,20 @@ async function showWarnExec(interaction: ChatInputCommandInteraction) {
     { state: EMessageReplyState.none },
   );
 
-  await interaction.reply({ embeds: [embed.getEmbed()] });
+  await interaction.reply({
+    embeds: [embed.getEmbed()],
+  });
 }
 
 async function warnRemoveExec(interaction: ChatInputCommandInteraction) {
   const warnId = interaction.options.getInteger("warn-id")!;
 
   await prisma.user_warn
-    .delete({ where: { id: warnId } })
+    .delete({
+      where: {
+        id: warnId,
+      },
+    })
     .then((warn) => {
       const member = interaction.guild?.members.cache.get(warn.user_id);
       const embed = new MessageSender(
@@ -283,7 +299,9 @@ async function warnRemoveExec(interaction: ChatInputCommandInteraction) {
         { state: EMessageReplyState.success },
       ).getEmbed();
 
-      return interaction.reply({ embeds: [embed] });
+      return interaction.reply({
+        embeds: [embed],
+      });
     })
     .catch(() => {
       const res = new MessageSender(
@@ -294,14 +312,18 @@ async function warnRemoveExec(interaction: ChatInputCommandInteraction) {
         },
         { state: EMessageReplyState.error },
       );
-      return interaction.reply({ embeds: [res.getEmbed()] });
+      return interaction.reply({
+        embeds: [res.getEmbed()],
+      });
     });
 }
 
 async function warnListExec(interaction: ChatInputCommandInteraction) {
   const warns = await prisma.user_warn.groupBy({
     by: ["user_id"],
-    _count: { id: true },
+    _count: {
+      id: true,
+    },
   });
 
   const table = new Table();
@@ -333,7 +355,9 @@ async function warnListExec(interaction: ChatInputCommandInteraction) {
     { state: EMessageReplyState.none },
   );
 
-  await interaction.reply({ embeds: [embed.getEmbed()] });
+  await interaction.reply({
+    embeds: [embed.getEmbed()],
+  });
 }
 
 const command: ClientSlash = {

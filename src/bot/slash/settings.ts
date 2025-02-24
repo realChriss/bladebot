@@ -22,7 +22,9 @@ async function reply(
     { state: success ? EMessageReplyState.success : EMessageReplyState.error },
   );
 
-  await interaction.reply({ embeds: [embed.getEmbed()] });
+  await interaction.reply({
+    embeds: [embed.getEmbed()],
+  });
 }
 
 const settingsMap: Record<
