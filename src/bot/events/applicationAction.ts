@@ -168,7 +168,10 @@ const event: ClientEvent = {
       const nickname = `${appliedMember.user.globalName || appliedMember.user.username} (${application.roblox_user})`;
 
       if (nickname.length <= 32) {
-        await appliedMember.setNickname(nickname);
+        await appliedMember.setNickname(nickname)
+        .catch(() => {
+          Logger.warn(`Could not set nickname for ${appliedMember.user.username}`);
+        });
       } else {
         const nicknameError = new MessageSender(
           interaction.channel as SendableChannels,
@@ -193,7 +196,7 @@ const event: ClientEvent = {
             authorImg: appliedMember.user.displayAvatarURL(),
             authorName: displayName,
             title: `Welcome ${displayName}`,
-            description: `Say hello to **${displayName}**!`,
+            description: `Say hello to our new clan member **${displayName}**!`,
             thumbnail: application.roblox_headshot_url || undefined,
           },
           { state: EMessageReplyState.success },
