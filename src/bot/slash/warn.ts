@@ -19,12 +19,13 @@ async function getWarnCount(userId: string) {
     },
   });
 
-  const apWarnCount =
-    warnCounts.find((entry) => entry.warn_type_id === 1)?._count.warn_type_id ||
-    0;
-  const donationWarnCount =
-    warnCounts.find((entry) => entry.warn_type_id === 2)?._count.warn_type_id ||
-    0;
+  const counts = warnCounts.reduce((acc, curr) => {
+    acc[curr.warn_type_id] = curr._count.warn_type_id;
+    return acc;
+  }, {} as Record<number, number>);
+
+  const apWarnCount = counts[1] ?? 0;
+  const donationWarnCount = counts[2] ?? 0;
 
   return {
     apWarnCount,
