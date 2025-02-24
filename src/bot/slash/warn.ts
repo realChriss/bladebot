@@ -10,6 +10,28 @@ import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Table from "easy-table";
 
+async function getWarnCount(userId: string) {
+  const warnCounts = await prisma.user_warn.groupBy({
+    by: ["warn_type_id"],
+    _count: { warn_type_id: true },
+    where: {
+      user_id: userId,
+    },
+  });
+
+  const apWarnCount =
+    warnCounts.find((entry) => entry.warn_type_id === 1)?._count.warn_type_id ||
+    0;
+  const donationWarnCount =
+    warnCounts.find((entry) => entry.warn_type_id === 2)?._count.warn_type_id ||
+    0;
+
+  return {
+    apWarnCount,
+    donationWarnCount,
+  };
+}
+
 async function apWarnExec(interaction: ChatInputCommandInteraction) {
   const member = interaction.guild?.members.resolve(
     interaction.options.getUser("target")!.id,
@@ -27,21 +49,6 @@ async function apWarnExec(interaction: ChatInputCommandInteraction) {
 
   await interaction.deferReply();
 
-  const apWarnCount = await prisma.user_warn.count({
-    where: {
-      user_id: member.id,
-      warn_type_id: 1,
-    },
-  });
-  const donationWarnCount = await prisma.user_warn.count({
-    where: {
-      user_id: member.id,
-      warn_type_id: 2,
-    },
-  });
-
-  const finalApWarnCount = apWarnCount + 1;
-
   const warn = await prisma.user_warn.create({
     data: {
       user_id: member.id,
@@ -52,12 +59,14 @@ async function apWarnExec(interaction: ChatInputCommandInteraction) {
     },
   });
 
+  const { apWarnCount, donationWarnCount } = await getWarnCount(member.id);
+
   const warnEmbed = new MessageSender(
     null,
     {
       authorName: process.env.CLAN_NAME,
       title: "Warned",
-      description: `You have been warned for not meeting the AP requirement.\n\n**Warn Information:**\nAP Requirement: ${apRequirement}\nAP Earned: ${apEarned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${finalApWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
+      description: `You have been warned for not meeting the AP requirement.\n\n**Warn Information:**\nAP Requirement: ${apRequirement}\nAP Earned: ${apEarned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: "Open a ticket for more information",
     },
     {
@@ -85,7 +94,7 @@ async function apWarnExec(interaction: ChatInputCommandInteraction) {
     null,
     {
       title: `${member.displayName} was warned`,
-      description: `**Warn Info:**\nWarn type: AP\nAP Requirement: ${apRequirement}\nAP Earned: ${apEarned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${finalApWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
+      description: `**Warn Info:**\nWarn type: AP\nAP Requirement: ${apRequirement}\nAP Earned: ${apEarned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: interaction.member?.user.username,
     },
     {
@@ -117,21 +126,6 @@ async function donationWarnExec(interaction: ChatInputCommandInteraction) {
 
   await interaction.deferReply();
 
-  const apWarnCount = await prisma.user_warn.count({
-    where: {
-      user_id: member.id,
-      warn_type_id: 1,
-    },
-  });
-  const donationWarnCount = await prisma.user_warn.count({
-    where: {
-      user_id: member.id,
-      warn_type_id: 2,
-    },
-  });
-
-  const finalDonationWarnCount = donationWarnCount + 1;
-
   const warn = await prisma.user_warn.create({
     data: {
       user_id: member.id,
@@ -142,12 +136,14 @@ async function donationWarnExec(interaction: ChatInputCommandInteraction) {
     },
   });
 
+  const { apWarnCount, donationWarnCount } = await getWarnCount(member.id);
+
   const warnEmbed = new MessageSender(
     null,
     {
       authorName: process.env.CLAN_NAME,
       title: "Warned",
-      description: `You have been warned for not meeting the Donation requirement.\n\n**Warn Information:**\nDonation Requirement: ${donationRequirement}\nAmount Donated: ${donated}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${finalDonationWarnCount}`,
+      description: `You have been warned for not meeting the Donation requirement.\n\n**Warn Information:**\nDonation Requirement: ${donationRequirement}\nAmount Donated: ${donated}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: "Open a ticket for more information",
     },
     {
@@ -175,7 +171,7 @@ async function donationWarnExec(interaction: ChatInputCommandInteraction) {
     null,
     {
       title: `${member.displayName} was warned`,
-      description: `**Warn Info:**\nWarn type: Donation\nDonation Requirement: ${donationRequirement}\nAmount Donated: ${donated}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${finalDonationWarnCount}`,
+      description: `**Warn Info:**\nWarn type: Donation\nDonation Requirement: ${donationRequirement}\nAmount Donated: ${donated}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: interaction.member?.user.username,
     },
     {

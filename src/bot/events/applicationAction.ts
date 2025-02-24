@@ -168,9 +168,10 @@ const event: ClientEvent = {
       const nickname = `${appliedMember.user.globalName || appliedMember.user.username} (${application.roblox_user})`;
 
       if (nickname.length <= 32) {
-        await appliedMember.setNickname(nickname)
-        .catch(() => {
-          Logger.warn(`Could not set nickname for ${appliedMember.user.username}`);
+        await appliedMember.setNickname(nickname).catch(() => {
+          Logger.warn(
+            `Could not set nickname for ${appliedMember.user.username}`,
+          );
         });
       } else {
         const nicknameError = new MessageSender(
