@@ -9,6 +9,7 @@ import { EMessageReplyState } from "../types/MsgReplyState";
 import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Table from "easy-table";
+import { user_warn } from "@prisma/client";
 
 interface WarnConfig {
   warnTypeId: number;
@@ -17,17 +18,6 @@ interface WarnConfig {
   earnedOptionName: string;
   requirementLabel: string;
   earnedLabel: string;
-}
-
-interface Warn {
-  id: number;
-  user_id: string;
-  issuer_id: string;
-  requirement: number;
-  earned: number;
-  diff: number | null;
-  created_at: Date | string;
-  warn_type_id: number;
 }
 
 const warnTypeData: Record<
@@ -223,7 +213,7 @@ async function showWarnExec(interaction: ChatInputCommandInteraction) {
   const donationWarnCount = warns.filter((w) => w.warn_type_id === 2).length;
 
   const buildWarnField = (
-    warn: Warn,
+    warn: user_warn,
   ): { name: string; value: string; inline: boolean } => {
     const createdAtTimestamp = Math.floor(
       new Date(warn.created_at).getTime() / 1000,
