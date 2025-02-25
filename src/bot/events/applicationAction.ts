@@ -45,20 +45,18 @@ async function getApplication(interaction: ButtonInteraction) {
 async function sendDMWithFallback(
   member: GuildMember,
   embed: ReturnType<MessageSender["getEmbed"]>,
-  fallback: () => Promise<void>
+  fallback: () => Promise<void>,
 ) {
   await member.createDM().catch(() => null);
-  await member.dmChannel
-    ?.send({ embeds: [embed] })
-    .catch(async () => {
-      await fallback();
-    });
+  await member.dmChannel?.send({ embeds: [embed] }).catch(async () => {
+    await fallback();
+  });
 }
 
 async function updateOriginalEmbed(
   interaction: ButtonInteraction,
   footerText: string,
-  color: number
+  color: number,
 ) {
   const originalEmbed = interaction.message.embeds[0];
   if (!originalEmbed) return;
@@ -80,7 +78,7 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
   if (!application) return;
 
   const appliedMember = interaction.guild?.members.cache.get(
-    application.user_id
+    application.user_id,
   );
   if (!appliedMember) {
     await interaction.editReply("This user is not in the server");
@@ -88,7 +86,7 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
   }
 
   const mainChat = interaction.guild?.channels.cache.get(
-    process.env.MAIN_CHANNEL!
+    process.env.MAIN_CHANNEL!,
   );
   if (!mainChat || !mainChat.isSendable()) {
     Logger.error("Main chat not found");
@@ -113,22 +111,22 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
           messageContent: `<@${appliedMember.id}>`,
           ...embedContent,
         },
-        { state: EMessageReplyState.success }
+        { state: EMessageReplyState.success },
       ).sendMessage();
     }
   });
 
   await interaction.editReply(
-    `Success: Accepted \`${appliedMember.user.username}\``
+    `Success: Accepted \`${appliedMember.user.username}\``,
   );
   await updateOriginalEmbed(
     interaction,
     `Accepted by ${interaction.member?.user.username}`,
-    0x04ff00
+    0x04ff00,
   );
 
   const invChannel = interaction.guild?.channels.cache.get(
-    process.env.PENDING_INV_CHANNEL!
+    process.env.PENDING_INV_CHANNEL!,
   );
   if (!invChannel || !invChannel.isSendable()) {
     Logger.error("Invite channel not found");
@@ -142,11 +140,10 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
       title: "Pending Invite",
       description: `Roblox Username: \`${application.roblox_user}\`\n\nDiscord User: \`${appliedMember.user.username}\`\nDiscord Ping: <@${application.user_id}>`,
       thumbnail: application.roblox_headshot_url || undefined,
-      footerText:
-        "Press the button, after the user was invited to the clan",
+      footerText: "Press the button, after the user was invited to the clan",
       color: 0xffffff,
     },
-    { state: EMessageReplyState.none }
+    { state: EMessageReplyState.none },
   );
 
   const pendingMsg = await invChannel.send({
@@ -162,8 +159,8 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
         msg_id: application.msg_id,
       },
     },
-    data: { 
-      pending_msg_id: pendingMsg.id 
+    data: {
+      pending_msg_id: pendingMsg.id,
     },
   });
 
@@ -182,15 +179,11 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
       {
         description: `New nickname for \`${displayName}\` is longer than 32 chars`,
       },
-      { state: EMessageReplyState.error }
+      { state: EMessageReplyState.error },
     ).sendMessage();
   }
 
-  if (
-    mainChat &&
-    mainChat.isSendable() &&
-    (await ConfigManager.isWlcMsgOn())
-  ) {
+  if (mainChat && mainChat.isSendable() && (await ConfigManager.isWlcMsgOn())) {
     await new MessageSender(
       mainChat,
       {
@@ -201,7 +194,7 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
         thumbnail: application.roblox_headshot_url || undefined,
         footerText: process.env.CLAN_NAME,
       },
-      { state: EMessageReplyState.success }
+      { state: EMessageReplyState.success },
     ).sendMessage();
   }
 }
@@ -221,7 +214,7 @@ async function handleApplicationReject(interaction: ButtonInteraction) {
   });
 
   const appliedMember = interaction.guild?.members.cache.get(
-    application.user_id
+    application.user_id,
   );
   if (!appliedMember) {
     await interaction.editReply("This user is not in the server");
@@ -240,20 +233,20 @@ async function handleApplicationReject(interaction: ButtonInteraction) {
   await sendDMWithFallback(appliedMember, dmEmbed, async () => {
     if (interaction.channel?.isSendable()) {
       await interaction.channel.send(
-        `Could not DM ${appliedMember.user.username} for rejection`
+        `Could not DM ${appliedMember.user.username} for rejection`,
       );
     }
     Logger.warn(`Could not DM ${appliedMember.user.username} for rejection`);
   });
 
   await interaction.editReply(
-    `Success: Rejected \`${application.discord_user}\``
+    `Success: Rejected \`${application.discord_user}\``,
   );
-  
+
   await updateOriginalEmbed(
     interaction,
     `Rejected by ${interaction.member?.user.username}`,
-    0xff0000
+    0xff0000,
   );
 }
 
@@ -272,7 +265,7 @@ async function handleApplicationDelete(interaction: ButtonInteraction) {
   });
 
   const appliedMember = interaction.guild?.members.cache.get(
-    application.user_id
+    application.user_id,
   );
   if (!appliedMember) {
     await interaction.editReply("This user is not in the server");
@@ -294,24 +287,24 @@ async function handleApplicationDelete(interaction: ButtonInteraction) {
   });
 
   await interaction.editReply(
-    `Success: Deleted \`${application.discord_user}\``
+    `Success: Deleted \`${application.discord_user}\``,
   );
   await updateOriginalEmbed(
     interaction,
     `Deleted by ${interaction.member?.user.username}`,
-    0xa0a0a0
+    0xa0a0a0,
   );
 }
 
 async function handleApplicationVerifyAndWaitlist(
-  interaction: ButtonInteraction
+  interaction: ButtonInteraction,
 ) {
   await interaction.deferReply();
   const application = await getApplication(interaction);
   if (!application) return;
 
   const appliedMember = interaction.guild?.members.cache.get(
-    application.user_id
+    application.user_id,
   );
   if (!appliedMember) {
     await interaction.editReply("This user is not in the server");
@@ -325,7 +318,7 @@ async function handleApplicationVerifyAndWaitlist(
   await appliedMember.roles.remove(process.env.UNVERIFIED_ROLE!);
 
   await interaction.editReply(
-    `Success: Verified and waitlisted \`${application.discord_user}\``
+    `Success: Verified and waitlisted \`${application.discord_user}\``,
   );
 }
 
