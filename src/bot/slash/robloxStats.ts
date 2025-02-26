@@ -11,79 +11,117 @@ import ClientSlash from "../classes/ClientSlash";
 import { TMessageReplyPayload } from "../types/MsgReplyPayload";
 import Logger from "../../utils/Logger";
 
-function getUsername(interaction: ChatInputCommandInteraction): string {
-  return interaction.options.getString("username")!;
+interface RobloxUserData {
+  id: number;
+  name: string;
 }
 
-function fetchRobloxUser(username: string) {
-  return axios
-    .post("https://users.roblox.com/v1/usernames/users", {
+interface RobloxProfileData {
+  id: number;
+  name: string;
+  description: string;
+  created: string;
+}
+
+interface RobloxAvatarData {
+  avatar: string;
+  headshot: string;
+}
+
+async function sendReply(
+  interaction: ChatInputCommandInteraction,
+  payload: TMessageReplyPayload,
+  state: EMessageReplyState
+): Promise<void> {
+  const sender = new MessageSender(null, payload, { state });
+  await interaction.editReply({ 
+    embeds: [sender.getEmbed()] 
+  });
+}
+
+async function fetchRobloxUser(username: string): Promise<RobloxUserData | null> {
+  try {
+    const response = await axios.post("https://users.roblox.com/v1/usernames/users", {
       usernames: [username],
       excludeBannedUsers: true,
-    })
-    .then((response) => response.data);
-}
-
-function fetchRobloxProfile(userId: number) {
-  return axios
-    .get(`https://users.roblox.com/v1/users/${userId}`)
-    .then((response) => response.data);
-}
-
-async function getRobloxAvatar(
-  userId: number,
-): Promise<{ avatar: string; headshot: string } | null> {
-  const avatarResponse = await axios.get(
-    "https://thumbnails.roblox.com/v1/users/avatar",
-    {
-      params: {
-        userIds: userId,
-        size: "420x420",
-        format: "Png",
-        isCircular: false,
-      },
-      validateStatus: () => true,
-      timeout: 2000,
-    },
-  );
-
-  const avatarUrl = avatarResponse.data?.data?.[0]?.imageUrl as string;
-  if (!avatarUrl) {
+    });
+    
+    const userData = response.data.data[0];
+    return userData || null;
+  } catch (error) {
+    Logger.error(`Error fetching Roblox user data: ${error}`);
     return null;
   }
-
-  const headshotUrl = avatarUrl.replace(/Avatar/g, "AvatarHeadshot");
-  return { avatar: avatarUrl, headshot: headshotUrl };
 }
 
-function findDiscordUser(
-  robloxUser: string,
-  client: Client,
-): GuildMember | null {
+async function fetchRobloxProfile(userId: number): Promise<RobloxProfileData | null> {
+  try {
+    const response = await axios.get(`https://users.roblox.com/v1/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    Logger.error(`Error fetching Roblox profile: ${error}`);
+    return null;
+  }
+}
+
+async function getRobloxAvatar(userId: number): Promise<RobloxAvatarData | null> {
+  try {
+    const avatarResponse = await axios.get(
+      "https://thumbnails.roblox.com/v1/users/avatar",
+      {
+        params: {
+          userIds: userId,
+          size: "420x420",
+          format: "Png",
+          isCircular: false,
+        },
+        validateStatus: () => true,
+        timeout: 2000,
+      }
+    );
+
+    const avatarUrl = avatarResponse.data?.data?.[0]?.imageUrl as string;
+    if (!avatarUrl) {
+      return null;
+    }
+
+    const headshotUrl = avatarUrl.replace(/Avatar/g, "AvatarHeadshot");
+    return { 
+      avatar: avatarUrl, 
+      headshot: headshotUrl 
+    };
+  } catch (error) {
+    Logger.error(`Error fetching Roblox avatar: ${error}`);
+    return null;
+  }
+}
+
+function findDiscordUser(robloxUser: string, client: Client): GuildMember | null {
   const server = client.guilds.cache.get(process.env.SERVER_ID!);
-
   if (!server) {
+    Logger.error(`Server not found`);
     return null;
   }
 
-  const member = server.members.cache.find((member) =>
-    member.displayName.toLowerCase().includes(`(${robloxUser.toLowerCase()})`),
-  );
-
-  return member || null;
+  return server.members.cache.find((member) =>
+    member.displayName.toLowerCase().includes(`(${robloxUser.toLowerCase()})`)
+  ) || null;
 }
 
-async function sendRobloxProfileMessage(
-  interaction: ChatInputCommandInteraction,
-  profileData: any,
+function createProfileEmbed(
+  profileData: RobloxProfileData,
   discordUser: GuildMember | null,
-  avatarData: { avatar: string; headshot: string } | null,
-) {
-  const messagePayload: TMessageReplyPayload = {
+  avatarData: RobloxAvatarData | null,
+  username: string
+): TMessageReplyPayload {
+  return {
     title: `${profileData.name}'s Profile`,
     description: profileData.description || "No description available.",
     fields: [
-      { name: "User ID", value: profileData.id.toString(), inline: true },
+      { 
+        name: "User ID", 
+        value: profileData.id.toString(), inline: true 
+      },
       {
         name: "Account Created",
         value: new Date(profileData.created).toDateString(),
@@ -95,37 +133,17 @@ async function sendRobloxProfileMessage(
       },
     ],
     color: 0x5865f2,
-    image: avatarData ? avatarData.avatar : undefined,
-    thumbnail: avatarData ? avatarData.headshot : undefined,
-    footerText: interaction.user.username,
+    image: avatarData?.avatar,
+    thumbnail: avatarData?.headshot,
+    footerText: username,
   };
-
-  const sender = new MessageSender(null, messagePayload, {
-    state: EMessageReplyState.success,
-  });
-
-  await interaction.editReply({
-    embeds: [sender.getEmbed()],
-  });
 }
 
-async function sendErrorResponse(
-  interaction: ChatInputCommandInteraction,
-  errorMsg: string,
-) {
-  const messagePayload: TMessageReplyPayload = {
+function createErrorEmbed(errorMsg: string, username: string): TMessageReplyPayload {
+  return {
     description: errorMsg,
-    color: 0xff0000,
-    footerText: interaction.user.username,
+    footerText: username,
   };
-
-  const sender = new MessageSender(null, messagePayload, {
-    state: EMessageReplyState.error,
-  });
-
-  await interaction.editReply({
-    embeds: [sender.getEmbed()],
-  });
 }
 
 const command: ClientSlash = {
@@ -136,48 +154,57 @@ const command: ClientSlash = {
       option
         .setName("username")
         .setDescription("The Roblox username to search for")
-        .setRequired(true),
+        .setRequired(true)
     ) as SlashCommandBuilder,
-  exec: async (
-    client: Client,
-    interaction: ChatInputCommandInteraction,
-  ): Promise<void> => {
+  
+  exec: async (client: Client, interaction: ChatInputCommandInteraction): Promise<void> => {
     await interaction.deferReply();
+    
+    const username = interaction.options.getString("username");
+    if (!username) {
+      await sendReply(interaction, createErrorEmbed("Username is required", interaction.user.username), EMessageReplyState.error);
+      return;
+    }
 
-    const username = getUsername(interaction);
+    const userData = await fetchRobloxUser(username);
+    if (!userData) {
+      await sendReply(
+        interaction, 
+        createErrorEmbed(`No Roblox user found with the username: **${username}**`, interaction.user.username),
+        EMessageReplyState.error
+      );
+      return;
+    }
 
-    fetchRobloxUser(username)
-      .then((usersResult) => {
-        if (usersResult.data.length === 0) {
-          sendErrorResponse(
-            interaction,
-            `No Roblox user found with the username: **${username}**`,
-          );
-          return;
-        }
+    try {
+      const [profileData, avatarData] = await Promise.all([
+        fetchRobloxProfile(userData.id),
+        getRobloxAvatar(userData.id)
+      ]);
 
-        const userData = usersResult.data[0];
-
-        return fetchRobloxProfile(userData.id).then((profileData) => {
-          return getRobloxAvatar(userData.id).then((avatarData) => {
-            const discordUser = findDiscordUser(username, client);
-            sendRobloxProfileMessage(
-              interaction,
-              profileData,
-              discordUser,
-              avatarData,
-            );
-          });
-        });
-      })
-      .catch((error) => {
-        Logger.error("Error fetching Roblox data: " + error);
-        sendErrorResponse(
+      if (!profileData) {
+        await sendReply(
           interaction,
-          "An error occurred while fetching Roblox data.",
+          createErrorEmbed(`Could not fetch profile data for ${username}`, interaction.user.username),
+          EMessageReplyState.error
         );
-      });
+        return;
+      }
+
+      const discordUser = findDiscordUser(username, client);
+      
+      const profileEmbed = createProfileEmbed(profileData, discordUser, avatarData, interaction.user.username);
+      await sendReply(interaction, profileEmbed, EMessageReplyState.success);
+    } catch (error) {
+      Logger.error(`Error in Roblox stats command: ${error}`);
+      await sendReply(
+        interaction,
+        createErrorEmbed("An error occurred while fetching Roblox data.", interaction.user.username),
+        EMessageReplyState.error
+      );
+    }
   },
+  
   options: {
     isDisabled: false,
     onlyBotChannel: false,
