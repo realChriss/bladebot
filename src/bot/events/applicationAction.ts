@@ -110,7 +110,7 @@ async function sendPendingInvite(
     invChannel,
     {
       title: "Pending Invite",
-      description: `Roblox Username: \`${application.roblox_user}\`\n\nDiscord User: \`${appliedMember.user.username}\`\nDiscord Ping: <@${application.user_id}>`,
+      description: `Roblox Username: \`${application.roblox_user}\`\n\nDiscord User: \`${appliedMember.user.username}\`\nDiscord Ping: ${appliedMember.toString()}`,
       thumbnail: application.roblox_headshot_url || undefined,
       footerText: "Press the button, after the user was invited to the clan",
       color: 0xffffff,
@@ -119,7 +119,7 @@ async function sendPendingInvite(
   );
 
   const pendingMsg = await invChannel.send({
-    content: `<@${interaction.member?.user.id}>`,
+    content: interaction.member?.toString(),
     embeds: [inviteMsg.getEmbed()],
     components,
   });
@@ -221,7 +221,7 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
       await new MessageSender(
         mainChat as SendableChannels,
         {
-          messageContent: `<@${appliedMember.id}>`,
+          messageContent: appliedMember.toString(),
           ...embedContent,
         },
         { state: EMessageReplyState.success },

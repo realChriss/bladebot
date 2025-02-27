@@ -236,7 +236,7 @@ const event: ClientEvent = {
             fields: [
               {
                 name: "Discord User",
-                value: `Username: \`${member.user.username}\`\nDisplay Name: \`${member.displayName}\`\nPing: <@${member.id}>`,
+                value: `Username: \`${member.user.username}\`\nDisplay Name: \`${member.displayName}\`\nPing: ${member.toString()}`,
               },
               {
                 name: "Roblox User",

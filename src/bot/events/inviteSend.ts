@@ -72,7 +72,7 @@ const event: ClientEvent = {
           }
 
           await mainChat.send({
-            content: `<@${application.user_id}>`,
+            content: appliedMember.toString(),
             embeds: [embed],
           });
         });
