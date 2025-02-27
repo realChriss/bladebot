@@ -19,6 +19,7 @@ interface RobloxUserData {
 interface RobloxProfileData {
   id: number;
   name: string;
+  displayName: string;
   description: string;
   created: string;
 }
@@ -120,16 +121,23 @@ function createProfileEmbed(
     fields: [
       { 
         name: "User ID", 
-        value: profileData.id.toString(), inline: true 
+        value: profileData.id.toString(), 
+        inline: true 
+      },
+      { 
+        name: "Display Name", 
+        value: profileData.displayName || "Not set", 
+        inline: true 
       },
       {
         name: "Account Created",
         value: new Date(profileData.created).toDateString(),
-        inline: true,
+        
       },
       {
         name: "Discord User",
         value: discordUser ? `${discordUser.displayName}\n${discordUser.toString()}` : "Not found",
+        inline: true,
       },
     ],
     color: 0x5865f2,
