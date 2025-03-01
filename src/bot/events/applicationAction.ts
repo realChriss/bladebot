@@ -173,7 +173,7 @@ async function sendWelcomeMessage(
     await new MessageSender(
       mainChat,
       {
-        authorImg: appliedMember.user.displayAvatarURL(),
+        authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.displayName,
         title: `Welcome ${appliedMember.displayName}`,
         description: `Say hello to our new clan member **${appliedMember.displayName}**!`,
