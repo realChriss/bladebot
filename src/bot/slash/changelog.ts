@@ -91,10 +91,7 @@ const command: ClientSlash = {
   data: new SlashCommandBuilder()
     .setName("changelog")
     .setDescription("Shows the last 5 commits from git") as SlashCommandBuilder,
-
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
-    await interaction.deferReply();
-
     const commits = getGitCommits();
     const repoInfo = getRepoInfo();
 
@@ -108,7 +105,7 @@ const command: ClientSlash = {
         { state: EMessageReplyState.error },
       );
 
-      await interaction.editReply({
+      await interaction.reply({
         embeds: [errorEmbed.getEmbed()],
       });
       
@@ -132,11 +129,10 @@ const command: ClientSlash = {
       { state: EMessageReplyState.none },
     );
 
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [replyEmbed.getEmbed()],
     });
   },
-
   options: {
     isDisabled: false,
     onlyBotChannel: false,
