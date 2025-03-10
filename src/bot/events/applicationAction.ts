@@ -317,6 +317,7 @@ async function handleApplicationDelete(interaction: ButtonInteraction) {
   }
 
   const embedContent: TMessageReplyPayload = {
+    authorName: process.env.CLAN_NAME,
     title: "Your application has been deleted",
     description: `Your application at **${process.env.CLAN_NAME}** has been deleted.\nThis could be due to various reasons.\nYou can reapply at any time.`,
     footerText: "Create a ticket for more information",
