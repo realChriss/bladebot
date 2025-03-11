@@ -81,7 +81,7 @@ function formatCommitsToMarkdown(commits: GitCommit[]): string {
   const formattedCommits = commits
     .map(
       (commit) =>
-        `[${commit.hash}] ${commit.message}\n# Date: ${commit.date}\n`,
+        `[\`${commit.hash}\`] ${commit.message}\n# Date: ${commit.date}\n`,
     )
     .join("\n");
 
