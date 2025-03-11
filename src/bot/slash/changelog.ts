@@ -16,6 +16,12 @@ interface GitCommit {
   message: string;
 }
 
+interface RepoInfo {
+  currentBranch: string;
+  repoUrl: string;
+  commitCount: string;
+}
+
 function getGitCommits(count: number = 5): GitCommit[] {
   try {
     const gitLogCommand = `git log -n ${count} --pretty=format:"%h|%an|%ad|%s" --date=short`;
@@ -39,11 +45,7 @@ function getGitCommits(count: number = 5): GitCommit[] {
   }
 }
 
-function getRepoInfo(): {
-  currentBranch: string;
-  repoUrl: string;
-  commitCount: string;
-} {
+function getRepoInfo(): RepoInfo {
   try {
     const currentBranch = execSync("git rev-parse --abbrev-ref HEAD", {
       encoding: "utf-8",
@@ -53,13 +55,12 @@ function getRepoInfo(): {
       encoding: "utf-8",
     }).trim();
 
-    // Get the repository URL from the remote origin
     const repoUrl = execSync("git config --get remote.origin.url", {
       encoding: "utf-8",
     })
       .trim()
-      .replace(/\.git$/, "") // Remove .git suffix
-      .replace(/^git@github\.com:/, "https://github.com/"); // Convert SSH to HTTPS URL
+      .replace(/\.git$/, "")
+      .replace(/^git@github\.com:/, "https://github.com/");
 
     return {
       currentBranch,
@@ -80,7 +81,7 @@ function formatCommitsToMarkdown(commits: GitCommit[]): string {
   const formattedCommits = commits
     .map(
       (commit) =>
-        `[${commit.hash}] ${commit.message}\n# Author: ${commit.author}\n# Date: ${commit.date}\n`,
+        `[${commit.hash}] ${commit.message}\n# Date: ${commit.date}\n`,
     )
     .join("\n");
 
@@ -90,7 +91,7 @@ function formatCommitsToMarkdown(commits: GitCommit[]): string {
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
     .setName("changelog")
-    .setDescription("Shows the last 5 commits from git") as SlashCommandBuilder,
+    .setDescription("Shows the changelog") as SlashCommandBuilder,
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     const commits = getGitCommits();
     const repoInfo = getRepoInfo();
