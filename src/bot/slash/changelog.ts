@@ -109,7 +109,7 @@ const command: ClientSlash = {
       await interaction.reply({
         embeds: [errorEmbed.getEmbed()],
       });
-      
+
       return;
     }
 
