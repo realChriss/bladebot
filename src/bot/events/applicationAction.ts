@@ -13,6 +13,7 @@ import Logger from "../../utils/Logger";
 import { TMessageReplyPayload } from "../types/MsgReplyPayload";
 import ConfigManager from "../../utils/ConfigManager";
 import { application } from "@prisma/client";
+import { TMessageEmbed } from "../types/MsgEmbed";
 
 const components = [
   {
@@ -153,7 +154,7 @@ async function updateNickname(
     await new MessageSender(
       interaction.channel as SendableChannels,
       {
-        description: `New nickname for \`${displayName}\` is longer than 32 chars`,
+        description: `New nickname for **${displayName}** is longer than 32 chars`,
       },
       { state: EMessageReplyState.error },
     ).sendMessage();
@@ -229,9 +230,18 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
     }
   });
 
-  await interaction.editReply(
-    `Success: Accepted \`${appliedMember.user.username}\``,
-  );
+  const embed = new MessageSender(
+    null,
+    {
+      description: `Accepted **${appliedMember.user.username}**'s application`,
+      footerText: interaction.user.username,
+    },
+    { state: EMessageReplyState.success },
+  ).getEmbed();
+
+  await interaction.editReply({
+    embeds: [embed],
+  });
 
   await updateOriginalEmbed(
     interaction,
@@ -283,9 +293,18 @@ async function handleApplicationReject(interaction: ButtonInteraction) {
     Logger.warn(error);
   });
 
-  await interaction.editReply(
-    `Success: Rejected \`${application.discord_user}\``,
-  );
+  const embed = new MessageSender(
+    null,
+    {
+      description: `Rejected **${appliedMember.user.username}**'s application`,
+      footerText: interaction.user.username,
+    },
+    { state: EMessageReplyState.success },
+  ).getEmbed();
+
+  await interaction.editReply({
+    embeds: [embed],
+  });
 
   await updateOriginalEmbed(
     interaction,
@@ -331,9 +350,18 @@ async function handleApplicationDelete(interaction: ButtonInteraction) {
     Logger.warn(`Could not DM ${appliedMember.user.username}`);
   });
 
-  await interaction.editReply(
-    `Success: Deleted \`${application.discord_user}\``,
-  );
+  const embed = new MessageSender(
+    null,
+    {
+      description: `Deleted **${appliedMember.user.username}**'s application`,
+      footerText: interaction.user.username,
+    },
+    { state: EMessageReplyState.success },
+  ).getEmbed();
+
+  await interaction.editReply({
+    embeds: [embed],
+  });
 
   await updateOriginalEmbed(
     interaction,
@@ -363,9 +391,18 @@ async function handleApplicationVerifyAndWaitlist(
   ]);
   await appliedMember.roles.remove(process.env.UNVERIFIED_ROLE!);
 
-  await interaction.editReply(
-    `Success: Verified and waitlisted \`${application.discord_user}\``,
-  );
+  const embed = new MessageSender(
+    null,
+    {
+      description: `Verified and waitlisted **${appliedMember.user.username}**`,
+      footerText: interaction.user.username,
+    },
+    { state: EMessageReplyState.success },
+  ).getEmbed();
+
+  await interaction.editReply({
+    embeds: [embed],
+  });
 }
 
 const event: ClientEvent = {

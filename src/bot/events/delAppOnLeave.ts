@@ -2,6 +2,7 @@ import ClientEvent from "../classes/ClientEvent";
 import { Events, GuildMember, GuildTextBasedChannel } from "discord.js";
 import Logger from "../../utils/Logger";
 import prisma from "../../db/prisma";
+import { TMessageEmbed } from "../types/MsgEmbed";
 
 async function getApplication(userId: string) {
   const application = await prisma.application.findFirst({
@@ -65,8 +66,16 @@ const event: ClientEvent = {
         components: [],
       });
 
+      const embed: TMessageEmbed = {
+        description:
+          "Application has been deleted due to user leaving the server.",
+        color: 0xffbe01,
+      };
+
       await applicationMessage
-        .reply("Application has been deleted due to user leaving the server.")
+        .reply({
+          embeds: [embed],
+        })
         .catch(() => {
           Logger.error("Failed to send reply to application message");
           return null;

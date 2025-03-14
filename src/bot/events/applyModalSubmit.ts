@@ -227,7 +227,7 @@ const event: ClientEvent = {
         const member = interaction.member as GuildMember;
         const robloxAvatar = await getRobloxAvatar(robloxUsername);
 
-        const msg = new MessageSender(
+        const applicationEmbed = new MessageSender(
           channel,
           {
             authorName: member?.user.username,
@@ -253,12 +253,10 @@ const event: ClientEvent = {
           {
             state: EMessageReplyState.none,
           },
-        );
-
-        const embed = msg.getEmbed();
+        ).getEmbed();
 
         const applicationMsg = await channel.send({
-          embeds: [embed],
+          embeds: [applicationEmbed],
           components: getComponents(interaction.guildId!),
         });
 
@@ -277,15 +275,31 @@ const event: ClientEvent = {
         });
 
         const response = (await ConfigManager.isAppOpen())
-          ? "✅ Success! Please wait for an answer from this bot.\nPlease make sure that this bot is able to send you a DM."
-          : "✅ Success! Applications are currently closed.\nYou are placed on the **waitlist**";
+          ? "Please wait for an answer from this bot.\nMake sure that this bot is able to send you a DM."
+          : "Applications are currently closed.\nYou are placed on the **waitlist**";
+
+        const responseEmbed = new MessageSender(
+          null,
+          {
+            description: response,
+          },
+          { state: EMessageReplyState.success },
+        ).getEmbed();
 
         await interaction.editReply({
-          content: response,
+          embeds: [responseEmbed],
         });
       } else {
+        const responseEmbed = new MessageSender(
+          null,
+          {
+            description: `Error at field **${validity}**. Please try again.`,
+          },
+          { state: EMessageReplyState.error },
+        ).getEmbed();
+
         await interaction.editReply({
-          content: `❌ Error at field **${validity}**. Please try again.`,
+          embeds: [responseEmbed],
         });
       }
     }

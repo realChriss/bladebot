@@ -49,7 +49,7 @@ const event: ClientEvent = {
         return;
       }
 
-      const embed = new MessageSender(
+      const dmEmbed = new MessageSender(
         interaction.channel as GuildTextBasedChannel,
         {
           title: "📩 You have been invited to the clan",
@@ -61,7 +61,7 @@ const event: ClientEvent = {
       await appliedMember.createDM().catch(() => null);
 
       await appliedMember.dmChannel
-        ?.send({ embeds: [embed] })
+        ?.send({ embeds: [dmEmbed] })
         .catch(async () => {
           const mainChat = interaction.guild?.channels.cache.get(
             process.env.MAIN_CHANNEL!,
@@ -73,7 +73,7 @@ const event: ClientEvent = {
 
           await mainChat.send({
             content: appliedMember.toString(),
-            embeds: [embed],
+            embeds: [dmEmbed],
           });
         });
 
@@ -86,9 +86,18 @@ const event: ClientEvent = {
         },
       });
 
-      await interaction.editReply(
-        `Success: Sent confirmation to \`${appliedMember.user.username}\``,
-      );
+      const embed = new MessageSender(
+        null,
+        {
+          description: `Sent confirmation to **${appliedMember.user.username}**`,
+          footerText: interaction.user.username,
+        },
+        { state: EMessageReplyState.success },
+      ).getEmbed();
+
+      await interaction.editReply({
+        embeds: [embed],
+      });
 
       await interaction.message.edit({
         embeds: [
