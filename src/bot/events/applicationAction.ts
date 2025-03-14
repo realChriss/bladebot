@@ -176,8 +176,8 @@ async function sendWelcomeMessage(
       {
         authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.displayName,
-        title: `Welcome ${appliedMember.displayName}`,
-        description: `Say hello to our new clan member **${appliedMember.displayName}**!`,
+        title: `Welcome, ${appliedMember.user.displayName}!`,
+        description: `Say hello to our new clan member **${appliedMember.user.displayName}**!`,
         thumbnail: application.roblox_headshot_url || undefined,
         footerText: process.env.CLAN_NAME,
       },

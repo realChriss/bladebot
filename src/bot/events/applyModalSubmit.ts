@@ -338,6 +338,7 @@ const event: ClientEvent = {
           {
             description: response,
             thumbnail: robloxAvatar?.headshot,
+            footerText: "-> To cancel your application, press on apply again"
           },
           { state: EMessageReplyState.success },
         ).getEmbed();

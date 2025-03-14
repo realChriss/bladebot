@@ -2,6 +2,20 @@ import ClientEvent from "../classes/ClientEvent";
 import { ButtonInteraction, Events, Interaction } from "discord.js";
 import { getUserInput } from "../stores/applyModalStore";
 import prisma from "../../db/prisma";
+import MessageSender from "../classes/MessageSender";
+import { EMessageReplyState } from "../types/MsgReplyState";
+
+const cancelApplicationButton = {
+  type: 1,
+  components: [
+    {
+      type: 2,
+      label: "Cancel Application",
+      style: 4,
+      custom_id: "application_cancel",
+    },
+  ],
+};
 
 function createPrefilledModal(userId: string) {
   const userInput = getUserInput(userId);
@@ -104,8 +118,19 @@ const event: ClientEvent = {
       });
 
       if (application) {
+        const embed = new MessageSender(
+          null,
+          {
+            title: "Warning",
+            description:
+              "You already have a pending application.\nYou can cancel it using the button below",
+          },
+          { state: EMessageReplyState.error },
+        ).getEmbed();
+
         await interaction.reply({
-          content: "You have already applied",
+          embeds: [embed],
+          components: [cancelApplicationButton],
           ephemeral: true,
         });
         return;
