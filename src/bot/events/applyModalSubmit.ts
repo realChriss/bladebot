@@ -14,6 +14,12 @@ import { saveUserInput } from "../stores/applyModalStore";
 import prisma from "../../db/prisma";
 import ConfigManager from "../../utils/ConfigManager";
 
+interface ValidationError {
+  field: string;
+  value: string;
+  hint: string;
+}
+
 const components = [
   {
     type: 1,
@@ -46,6 +52,10 @@ const verifyAndWaitlistComponent = {
   style: 2,
   custom_id: "application_verify_and_waitlist",
 };
+
+function isValidInteger(value: string): boolean {
+  return /^\d+$/.test(value);
+}
 
 function getComponents(guildId: string) {
   if (guildId === "1202836858292404245") {
@@ -126,17 +136,18 @@ async function getRobloxAvatar(
 
 async function validate(
   userid: string,
+  username: string,
   robloxUsername: string,
   age: string,
   killCount: string,
   winCount: string,
-): Promise<boolean | string> {
+): Promise<{ valid: boolean; errors?: ValidationError[] }> {
   let store_username = "";
   let store_age = "";
   let store_kill = "";
   let store_win = "";
 
-  let error: boolean | string = false;
+  const errors: ValidationError[] = [];
 
   const res = await axios.post(
     "https://users.roblox.com/v1/usernames/users",
@@ -150,21 +161,60 @@ async function validate(
     },
   );
 
-  if (res.data?.data?.length === 1) store_username = robloxUsername;
-  else error = "Roblox Username";
+  if (res.data?.data?.length === 1) {
+    store_username = robloxUsername;
+  } else {
+    errors.push({
+      field: "Roblox Username",
+      value: robloxUsername,
+      hint: "Username does not exist or is invalid",
+    });
+  }
 
-  if (!isNaN(Number(age))) store_age = age;
-  else error = "Age";
+  if (isValidInteger(age)) {
+    store_age = age;
+  } else {
+    errors.push({
+      field: "Age",
+      value: age,
+      hint: "Must be a whole number",
+    });
+  }
 
-  if (!isNaN(Number(killCount))) store_kill = killCount;
-  else error = "Kill Count";
+  if (isValidInteger(killCount)) {
+    store_kill = killCount;
+  } else {
+    errors.push({
+      field: "Kill Count",
+      value: killCount,
+      hint: "Must be a whole number",
+    });
+  }
 
-  if (!isNaN(Number(winCount))) store_win = winCount;
-  else error = "Win Count";
+  if (isValidInteger(winCount)) {
+    store_win = winCount;
+  } else {
+    errors.push({
+      field: "Win Count",
+      value: winCount,
+      hint: "Must be a whole number",
+    });
+  }
+
+  if (errors.length > 0) {
+    const errorLog = errors
+      .map((err) => `${err.field}: "${err.value}"`)
+      .join(", ");
+
+    Logger.warn(`Invalid application from ${username} - Errors: ${errorLog}`);
+  }
 
   saveUserInput(userid, store_username, store_age, store_kill, store_win);
 
-  return !error ? true : error;
+  return {
+    valid: errors.length === 0,
+    errors: errors.length > 0 ? errors : undefined,
+  };
 }
 
 const event: ClientEvent = {
@@ -203,15 +253,16 @@ const event: ClientEvent = {
         return;
       }
 
-      const validity = await validate(
+      const validation = await validate(
         interaction.member?.user.id!,
+        interaction.member?.user.username!,
         robloxUsername,
         age,
         killCount,
         winCount,
       );
 
-      if (validity === true) {
+      if (validation.valid) {
         const channel = interaction.guild?.channels.cache.get(
           process.env.APPLICATION_CHANNEL!,
         );
@@ -219,7 +270,7 @@ const event: ClientEvent = {
         if (!channel || !channel.isSendable()) {
           Logger.error("❌ Application channel not found");
           await interaction.editReply({
-            content: "Error: Channel not found",
+            content: "Error: Application Channel not found",
           });
           return;
         }
@@ -275,13 +326,18 @@ const event: ClientEvent = {
         });
 
         const response = (await ConfigManager.isAppOpen())
-          ? "Please wait for an answer from this bot.\nMake sure that this bot is able to send you a DM."
-          : "Applications are currently closed.\nYou are placed on the **waitlist**";
+          ? "✅ Application submitted!\n\n" +
+            "**What's next?**\n" +
+            "• Your application will be reviewed by our staff team\n" +
+            "• You'll receive a response via DM from this bot\n\n" +
+            "Please ensure you have DMs enabled for this server"
+          : "Applications are currently closed.\nYou have been placed on the **waitlist**";
 
         const responseEmbed = new MessageSender(
           null,
           {
             description: response,
+            thumbnail: robloxAvatar?.headshot,
           },
           { state: EMessageReplyState.success },
         ).getEmbed();
@@ -290,10 +346,14 @@ const event: ClientEvent = {
           embeds: [responseEmbed],
         });
       } else {
+        const errorFields = validation
+          .errors!.map((err) => `**${err.field}**: ${err.hint}`)
+          .join("\n");
+
         const responseEmbed = new MessageSender(
           null,
           {
-            description: `Error at field **${validity}**. Please try again.`,
+            description: `Please fix the following errors:\n\n${errorFields}`,
           },
           { state: EMessageReplyState.error },
         ).getEmbed();
