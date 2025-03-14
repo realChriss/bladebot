@@ -61,7 +61,7 @@ const event: ClientEvent = {
 
     await interaction.editReply({
       embeds: [responseEmbed],
-      components: []
+      components: [],
     });
 
     const applicationChannel = interaction.guild?.channels.cache.get(
@@ -72,8 +72,8 @@ const event: ClientEvent = {
       const applicationMessage = await applicationChannel.messages
         .fetch(application.msg_id)
         .catch(() => {
-          Logger.error("Application message not found")
-          return null
+          Logger.error("Application message not found");
+          return null;
         });
 
       if (applicationMessage) {
@@ -98,7 +98,7 @@ const event: ClientEvent = {
         });
       }
     } else {
-      Logger.error("Application channel not found")
+      Logger.error("Application channel not found");
     }
 
     Logger.info(`Application self cancelled by ${interaction.user.username}`);

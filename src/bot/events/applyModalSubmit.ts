@@ -236,9 +236,15 @@ const event: ClientEvent = {
 
       const robloxUsername =
         interaction.fields.getTextInputValue("robloxUsername");
-      const age = interaction.fields.getTextInputValue("age");
-      const killCount = interaction.fields.getTextInputValue("killCount");
-      const winCount = interaction.fields.getTextInputValue("winCount");
+      const age = interaction.fields
+        .getTextInputValue("age")
+        .replace(/[.,]/g, "");
+      const killCount = interaction.fields
+        .getTextInputValue("killCount")
+        .replace(/[.,]/g, "");
+      const winCount = interaction.fields
+        .getTextInputValue("winCount")
+        .replace(/[.,]/g, "");
 
       const application = await prisma.application.findFirst({
         where: {
@@ -338,7 +344,7 @@ const event: ClientEvent = {
           {
             description: response,
             thumbnail: robloxAvatar?.headshot,
-            footerText: "-> To cancel your application, press on apply again"
+            footerText: "-> To cancel your application, press on apply again",
           },
           { state: EMessageReplyState.success },
         ).getEmbed();
