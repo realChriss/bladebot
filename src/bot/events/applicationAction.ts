@@ -13,7 +13,6 @@ import Logger from "../../utils/Logger";
 import { TMessageReplyPayload } from "../types/MsgReplyPayload";
 import ConfigManager from "../../utils/ConfigManager";
 import { application } from "@prisma/client";
-import { TMessageEmbed } from "../types/MsgEmbed";
 
 const components = [
   {
@@ -347,7 +346,11 @@ async function handleApplicationDelete(interaction: ButtonInteraction) {
   }).getEmbed();
 
   await sendDMWithFallback(appliedMember, dmEmbed, async () => {
-    Logger.warn(`Could not DM ${appliedMember.user.username}`);
+    const error = `Could not DM ${appliedMember.user.username}`
+    if (interaction.channel?.isSendable()) {
+      await interaction.channel.send(error);
+    }
+    Logger.warn(error);
   });
 
   const embed = new MessageSender(
