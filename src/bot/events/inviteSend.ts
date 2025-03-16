@@ -86,19 +86,6 @@ const event: ClientEvent = {
         },
       });
 
-      const embed = new MessageSender(
-        null,
-        {
-          description: `Sent confirmation to **${appliedMember.user.username}**`,
-          footerText: interaction.user.username,
-        },
-        { state: EMessageReplyState.success },
-      ).getEmbed();
-
-      await interaction.editReply({
-        embeds: [embed],
-      });
-
       await interaction.message.edit({
         embeds: [
           {
@@ -110,6 +97,21 @@ const event: ClientEvent = {
           },
         ],
         components: [],
+      });
+
+      const embed = new MessageSender(
+        null,
+        {
+          authorImg: appliedMember.displayAvatarURL(),
+          authorName: appliedMember.displayName,
+          description: `Sent confirmation to **${appliedMember.user.username}**`,
+          footerText: interaction.user.username,
+        },
+        { state: EMessageReplyState.success },
+      ).getEmbed();
+
+      await interaction.editReply({
+        embeds: [embed],
       });
     }
   },

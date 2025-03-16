@@ -232,6 +232,8 @@ async function handleApplicationAccept(interaction: ButtonInteraction) {
   const embed = new MessageSender(
     null,
     {
+      authorImg: appliedMember.displayAvatarURL(),
+      authorName: appliedMember.displayName,
       description: `Accepted **${appliedMember.user.username}**'s application`,
       footerText: interaction.user.username,
     },
@@ -295,6 +297,8 @@ async function handleApplicationReject(interaction: ButtonInteraction) {
   const embed = new MessageSender(
     null,
     {
+      authorImg: appliedMember.displayAvatarURL(),
+      authorName: appliedMember.displayName,
       description: `Rejected **${appliedMember.user.username}**'s application`,
       footerText: interaction.user.username,
     },
@@ -356,6 +360,8 @@ async function handleApplicationDelete(interaction: ButtonInteraction) {
   const embed = new MessageSender(
     null,
     {
+      authorImg: appliedMember.displayAvatarURL(),
+      authorName: appliedMember.displayName,
       description: `Deleted **${appliedMember.user.username}**'s application`,
       footerText: interaction.user.username,
     },
@@ -397,6 +403,8 @@ async function handleApplicationVerifyAndWaitlist(
   const embed = new MessageSender(
     null,
     {
+      authorImg: appliedMember.displayAvatarURL(),
+      authorName: appliedMember.displayName,
       description: `Verified and waitlisted **${appliedMember.user.username}**`,
       footerText: interaction.user.username,
     },
