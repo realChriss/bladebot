@@ -29,7 +29,7 @@ const event: ClientEvent = {
       applicationChannel,
       {
         title: "Clan Member Left",
-        description: `Clan member **${member.displayName}** has left the server.\n\nPing: ${member.toString()}\nUsername: \`${member.user.username}\`\nUser ID: \`${member.id}\``,
+        description: `Clan member **${member.displayName}** has left the server.\n\nPing: ${member.toString()}\nDisplay Name: \`${member.displayName}\`\nUser ID: \`${member.id}\``,
         thumbnail: member.user.displayAvatarURL({ size: 128 }),
         authorImg: member.user.displayAvatarURL({ size: 128 }),
         authorName: member.user.username,
