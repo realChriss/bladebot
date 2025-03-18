@@ -24,6 +24,7 @@ const command: ClientSlash = {
       {
         title: "Pong 🏓",
         description: `Connection:\nClient Ping: ${test.createdTimestamp - ms}ms\nWS Ping: ${client.ws.ping}ms`,
+        footerText: interaction.user.username,
       },
       {
         state: EMessageReplyState.success,

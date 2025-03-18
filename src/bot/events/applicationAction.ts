@@ -350,7 +350,7 @@ async function handleApplicationDelete(interaction: ButtonInteraction) {
   }).getEmbed();
 
   await sendDMWithFallback(appliedMember, dmEmbed, async () => {
-    const error = `Could not DM ${appliedMember.user.username}`
+    const error = `Could not DM ${appliedMember.user.username}`;
     if (interaction.channel?.isSendable()) {
       await interaction.channel.send(error);
     }

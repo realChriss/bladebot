@@ -76,6 +76,7 @@ const command: ClientSlash = {
       {
         title: "Pending Invite List",
         description: embedDescription,
+        authorName: interaction.user.username,
         color: 0xffffff,
       },
       {

@@ -72,6 +72,7 @@ const command: ClientSlash = {
       {
         title: "Application List",
         description: embedDescription,
+        footerText: interaction.user.username,
         color: 0xffffff,
       },
       {
