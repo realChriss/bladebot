@@ -68,8 +68,16 @@ const command: ClientSlash = {
         .join("\n");
     };
 
+    const getPendingInvitesText = (inviteCount: number, embedFieldValue: string) => {
+      if (inviteCount > 0) {
+        return `There ${inviteCount !== 1 ? 'are' : 'is'} ${inviteCount} pending invites\n\n**Pending Invites**\n${embedFieldValue}`;
+      }
+        
+      return `There are no pending invites`;
+    };
+
     const embedFieldValue = await getEmbedFieldValue();
-    const embedDescription = `There are ${inviteCount > 0 ? inviteCount : "no"} pending invites\n\n**Pending Invites**\n${embedFieldValue}`;
+    const embedDescription = getPendingInvitesText(inviteCount, embedFieldValue);
 
     const replyObj = new MessageSender(
       null,
