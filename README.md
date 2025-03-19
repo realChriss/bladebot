@@ -4,17 +4,34 @@ BladeBot is a Discord bot designed for BladeBall clan-servers to manage user app
 
 ## Features
 
-- **Application Management**  
-  Allows users to apply for the clan via interactive modals. Applications are validated against Roblox details and stored in the database. Administrators can view pending applications (see [`pendingApplications`](src/bot/slash/pendingApplications.ts)) and process them accordingly.
+### Application Management
 
-- **Warns & Notifications**  
-  Provides commands to issue warnings for unmet AP or donation requirements. Each warn is recorded in the database and users are notified through direct messages. Check out the [`warn`](src/bot/slash/warn.ts) command for details.
+Allows users to apply for the clan via interactive modals. Applications are validated against Roblox details and stored in the database. Administrators can view pending applications and process them accordingly.
 
-- **Interactive Slash Commands**  
-  Supports a range of slash commands such as `/ping` for latency checks, `/open` and `/close` for toggling application availability, and `/embed` for sending application embeds.
+### Warns & Notifications
 
-- **Role & Invite Management**  
-  Automatically assigns clan roles upon application acceptance, updates application statuses, and manages pending invites through interactive buttons. Refer to [`applicationAction`](src/bot/events/applicationAction.ts) and [`inviteSend`](src/bot/events/inviteSend.ts) for more details.
+Provides comprehensive warning system with multiple warning types:
+
+- **AP Warnings**: Issue warnings for members who don't meet AP (Activity Points) requirements
+- **Donation Warnings**: Track members who haven't met donation requirements
+- **Warning Management**: View, list, and remove warnings with detailed information
+- **Direct Notifications**: Members receive DM notifications about warnings with fallback to channel messages
+
+### Interactive Slash Commands
+
+Supports a range of slash commands such as `/ping` for latency checks, `/settings` for configuring bot settings (including opening/closing applications), and `/embed` for sending application embeds.
+
+### Role & Invite Management
+
+Automatically assigns clan roles upon application acceptance, updates application statuses, and manages pending invites through interactive buttons.
+
+### Changelog Tracking
+
+Tracks repository changes and provides information about the current branch and commit count.
+
+### Settings Management
+
+Allows administrators to configure bot settings through the `/settings` command, including toggling application availability.
 
 ## Project Structure
 
