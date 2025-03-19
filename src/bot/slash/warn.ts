@@ -2,6 +2,7 @@ import MessageSender from "../classes/MessageSender";
 import {
   ChatInputCommandInteraction,
   Client,
+  GuildMember,
   SendableChannels,
   SlashCommandBuilder,
 } from "discord.js";
@@ -75,7 +76,7 @@ async function resolveTargetMember(interaction: ChatInputCommandInteraction) {
 }
 
 async function sendDMorFallback(
-  member: any,
+  member: GuildMember,
   dmEmbed: MessageSender,
   fallbackChannel: SendableChannels,
 ) {
