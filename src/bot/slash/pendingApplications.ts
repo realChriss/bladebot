@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
+import { application } from "@prisma/client";
 
 async function fetchApplicationMessage(
   msgId: string,
@@ -20,6 +21,48 @@ async function fetchApplicationMessage(
   }
 
   return await channel.messages.fetch(msgId).catch(() => null);
+}
+
+async function getApplicationsListString(
+  interaction: ChatInputCommandInteraction,
+  pendingApplications: application[],
+) {
+  return (
+    await Promise.all(
+      pendingApplications.map(async (x) => {
+        const message = await fetchApplicationMessage(x.msg_id, interaction);
+
+        const discordUser = interaction.guild?.members.cache.get(x.user_id);
+
+        if (!discordUser) {
+          return null;
+        }
+
+        return {
+          username: discordUser.user.displayName,
+          url: message ? `[Jump](${message.url})` : "_Url Not Found_",
+          timestamp: message
+            ? `<t:${Math.floor(message.createdTimestamp / 1000)}:R>`
+            : "_No Time_",
+          createdTimestamp: message?.createdTimestamp || 0,
+        };
+      }),
+    )
+  )
+    .filter((x) => x !== null)
+    .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
+    .map(
+      ({ username, url, timestamp }) => `${username} — ${timestamp} — ${url}`,
+    )
+    .join("\n");
+}
+
+function buildEmbedDescription(applicationCount: number, listString: string) {
+  if (applicationCount > 0) {
+    return `There ${applicationCount !== 1 ? "are" : "is"} ${applicationCount} pending invites\n\n**Pending Invites**\n${listString}`;
+  }
+
+  return `There are no pending invites`;
 }
 
 const command: ClientSlash = {
@@ -36,35 +79,14 @@ const command: ClientSlash = {
     });
     const applicationCount = pendingApplications.length;
 
-    const getEmbedFieldValue = async () => {
-      return (
-        await Promise.all(
-          pendingApplications.map(async (x) => {
-            const message = await fetchApplicationMessage(
-              x.msg_id,
-              interaction,
-            );
-            return {
-              robloxUser: x.roblox_user,
-              url: message ? `[Jump](${message.url})` : "_Url Not Found_",
-              timestamp: message
-                ? `<t:${Math.floor(message.createdTimestamp / 1000)}:R>`
-                : "_No Time_",
-              createdTimestamp: message?.createdTimestamp || 0,
-            };
-          }),
-        )
-      )
-        .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
-        .map(
-          ({ robloxUser, url, timestamp }) =>
-            `${robloxUser} — ${timestamp} — ${url}`,
-        )
-        .join("\n");
-    };
-
-    const embedFieldValue = await getEmbedFieldValue();
-    const embedDescription = `There are ${applicationCount > 0 ? applicationCount : "no"} pending applications\n\n**Pending Applications**\n${embedFieldValue}`;
+    const embedFieldValue = await getApplicationsListString(
+      interaction,
+      pendingApplications,
+    );
+    const embedDescription = buildEmbedDescription(
+      applicationCount,
+      embedFieldValue,
+    );
 
     const replyObj = new MessageSender(
       null,
@@ -89,4 +111,5 @@ const command: ClientSlash = {
     allowStaff: true,
   },
 };
+
 export default command;

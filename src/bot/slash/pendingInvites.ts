@@ -8,6 +8,7 @@ import {
 import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Logger from "../../utils/Logger";
+import { application } from "@prisma/client";
 
 async function fetchInviteMessage(
   msgId: string,
@@ -22,6 +23,51 @@ async function fetchInviteMessage(
   }
 
   return await channel.messages.fetch(msgId).catch(() => null);
+}
+
+async function getInvitesListString(
+  interaction: ChatInputCommandInteraction,
+  pendingInvites: application[],
+) {
+  return (
+    await Promise.all(
+      pendingInvites.map(async (x) => {
+        const message = await fetchInviteMessage(
+          x.pending_msg_id!,
+          interaction,
+        );
+
+        const discordUser = interaction.guild?.members.cache.get(x.user_id);
+
+        if (!discordUser) {
+          return null;
+        }
+
+        return {
+          username: discordUser.user.displayName,
+          url: message ? `[Jump](${message.url})` : "_Url Not Found_",
+          timestamp: message
+            ? `<t:${Math.floor(message.createdTimestamp / 1000)}:R>`
+            : "_No Time_",
+          createdTimestamp: message?.createdTimestamp || 0,
+        };
+      }),
+    )
+  )
+    .filter((x) => x !== null)
+    .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
+    .map(
+      ({ username, url, timestamp }) => `${username} — ${timestamp} — ${url}`,
+    )
+    .join("\n");
+}
+
+function buildEmbedDescription(inviteCount: number, listString: string) {
+  if (inviteCount > 0) {
+    return `There ${inviteCount !== 1 ? "are" : "is"} ${inviteCount} pending invites\n\n**Pending Invites**\n${listString}`;
+  }
+
+  return `There are no pending invites`;
 }
 
 const command: ClientSlash = {
@@ -40,48 +86,13 @@ const command: ClientSlash = {
     });
     const inviteCount = pendingInvites.length;
 
-    const getEmbedFieldValue = async () => {
-      return (
-        await Promise.all(
-          pendingInvites.map(async (x) => {
-            const message = await fetchInviteMessage(
-              x.pending_msg_id!,
-              interaction,
-            );
-            return {
-              robloxUser: x.roblox_user,
-              url: message ? `[Jump](${message.url})` : "_Url Not Found_",
-              timestamp: message
-                ? `<t:${Math.floor(message.createdTimestamp / 1000)}:R>`
-                : "_No Time_",
-              createdTimestamp: message?.createdTimestamp || 0,
-            };
-          }),
-        )
-      )
-        .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
-        .map(
-          ({ robloxUser, url, timestamp }) =>
-            `${robloxUser} — ${timestamp} — ${url}`,
-        )
-        .join("\n");
-    };
-
-    const getPendingInvitesText = (
-      inviteCount: number,
-      embedFieldValue: string,
-    ) => {
-      if (inviteCount > 0) {
-        return `There ${inviteCount !== 1 ? "are" : "is"} ${inviteCount} pending invites\n\n**Pending Invites**\n${embedFieldValue}`;
-      }
-
-      return `There are no pending invites`;
-    };
-
-    const embedFieldValue = await getEmbedFieldValue();
-    const embedDescription = getPendingInvitesText(
+    const invitesListString = await getInvitesListString(
+      interaction,
+      pendingInvites,
+    );
+    const embedDescription = buildEmbedDescription(
       inviteCount,
-      embedFieldValue,
+      invitesListString,
     );
 
     const replyObj = new MessageSender(
@@ -107,4 +118,5 @@ const command: ClientSlash = {
     allowStaff: true,
   },
 };
+
 export default command;
