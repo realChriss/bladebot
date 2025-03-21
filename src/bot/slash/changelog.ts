@@ -7,13 +7,13 @@ import {
 import ClientSlash from "../classes/ClientSlash";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
-import path from 'path';
+import path from "path";
 
 function getBuildVersion(): BuildVersion | null {
-  const buildInfoPath = path.join(__dirname, '..', '..', 'build.json');
+  const buildInfoPath = path.join(__dirname, "..", "..", "build.json");
   try {
     const buildInfo = require(buildInfoPath);
-    
+
     return {
       branch: buildInfo.branchName,
       commit: buildInfo.commitHash,
