@@ -189,6 +189,10 @@ declare global {
     currentBranch: string;
     repoUrl: string;
     commitCount: string;
-    currentCommit: string;
+  }
+
+  interface BuildVersion {
+    branch: string;
+    commit: string;
   }
 }

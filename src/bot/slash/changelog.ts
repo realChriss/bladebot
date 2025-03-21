@@ -7,6 +7,22 @@ import {
 import ClientSlash from "../classes/ClientSlash";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
+import path from 'path';
+
+function getBuildVersion(): BuildVersion | null {
+  const buildInfoPath = path.join(__dirname, '..', '..', 'build.json');
+  try {
+    const buildInfo = require(buildInfoPath);
+    
+    return {
+      branch: buildInfo.branchName,
+      commit: buildInfo.commitHash,
+    };
+  } catch (error) {
+    Logger.warn(`Could not read build commit hash from file: ${error}`);
+    return null;
+  }
+}
 
 function getGitCommits(count: number = 5): GitCommit[] {
   try {
@@ -56,7 +72,6 @@ function getRepoInfo(): RepoInfo {
       currentBranch,
       repoUrl,
       commitCount,
-      currentCommit,
     };
   } catch (error) {
     Logger.error(`Failed to get repo info: ${error}`);
@@ -64,7 +79,6 @@ function getRepoInfo(): RepoInfo {
       currentBranch: "unknown",
       repoUrl: "unknown",
       commitCount: "0",
-      currentCommit: "unknown",
     };
   }
 }
@@ -87,6 +101,7 @@ const command: ClientSlash = {
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     const commits = getGitCommits();
     const repoInfo = getRepoInfo();
+    const buildVersion = getBuildVersion();
 
     if (commits.length === 0) {
       const errorEmbed = new MessageSender(
@@ -105,18 +120,20 @@ const command: ClientSlash = {
       return;
     }
 
+    const description = [
+      `**Build Branch:** ${buildVersion?.branch || "unknown"}`,
+      `**Build Commit:** \`${buildVersion?.commit || "unknown"}\``,
+      `**Repository:** [View on GitHub](${repoInfo.repoUrl})`,
+      `**Total Commits:** \`${repoInfo.commitCount}\``,
+      "\n**Recent Commits:**",
+      formatCommitsToMarkdown(commits),
+    ];
+
     const replyEmbed = new MessageSender(
       null,
       {
         title: "📝 Changelog",
-        description: [
-          `**Branch:** ${repoInfo.currentBranch}`,
-          `**Current Commit:** \`${repoInfo.currentCommit}\``,
-          `**Repository:** [View on GitHub](${repoInfo.repoUrl})`,
-          `**Total Commits:** \`${repoInfo.commitCount}\``,
-          "\n**Recent Commits:**",
-          formatCommitsToMarkdown(commits),
-        ].join("\n"),
+        description: description.join("\n"),
         footerText: interaction.user.username,
         color: 0x58b9ff,
       },
