@@ -5,7 +5,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import ClientSlash from "../classes/ClientSlash";
-import MessageSender from "../classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 
 interface GitCommit {

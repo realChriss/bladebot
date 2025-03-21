@@ -5,7 +5,7 @@ import {
   GuildMember,
 } from "discord.js";
 import axios from "axios";
-import MessageSender from "../classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import ClientSlash from "../classes/ClientSlash";
 import Logger from "../../utils/Logger";
 

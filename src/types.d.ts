@@ -130,12 +130,6 @@ declare global {
   };
 
   // Message Reply Types
-  enum EMessageReplyState {
-    success,
-    error,
-    none,
-  }
-
   type TMessageReplyOptions = {
     deleteAfterSecs?: number;
     state: EMessageReplyState;

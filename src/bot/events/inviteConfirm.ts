@@ -5,7 +5,7 @@ import {
   GuildTextBasedChannel,
   Interaction,
 } from "discord.js";
-import MessageSender from "../classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 import prisma from "../../db/prisma";
 

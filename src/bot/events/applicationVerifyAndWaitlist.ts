@@ -1,6 +1,6 @@
 import ClientEvent from "../classes/ClientEvent";
 import { Events, Interaction, ButtonInteraction } from "discord.js";
-import MessageSender from "../classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import {
   getAppliedMember,
   getApplication,

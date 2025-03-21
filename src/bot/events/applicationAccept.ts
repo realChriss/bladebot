@@ -7,7 +7,7 @@ import {
   SendableChannels,
 } from "discord.js";
 import prisma from "../../db/prisma";
-import MessageSender from "../classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 import ConfigManager from "../../utils/ConfigManager";
 import {

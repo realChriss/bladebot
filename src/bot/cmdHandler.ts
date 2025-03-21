@@ -4,7 +4,7 @@ import Logger from "../utils/Logger";
 import moment from "moment-timezone";
 import ClientCommand from "./classes/ClientCommand";
 import client from "./client";
-import MessageSender from "./classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "./classes/MessageSender";
 import { Channel, GuildMember, Message, PermissionFlagsBits } from "discord.js";
 
 class CooldownManager {

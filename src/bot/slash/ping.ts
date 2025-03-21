@@ -1,4 +1,4 @@
-import MessageSender from "../classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import {
   ChatInputCommandInteraction,
   Client,

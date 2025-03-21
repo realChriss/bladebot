@@ -1,6 +1,12 @@
 import { Message, SendableChannels } from "discord.js";
 import Logger from "../../utils/Logger";
 
+export enum EMessageReplyState {
+  success,
+  error,
+  none,
+}
+
 export default class MessageSender implements IMessageSender {
   readonly message?: Message;
   readonly channel?: SendableChannels;

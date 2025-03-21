@@ -5,7 +5,7 @@ import {
 } from "discord.js";
 import ClientSlash from "../classes/ClientSlash";
 import ConfigManager from "../../utils/ConfigManager";
-import MessageSender from "../classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 
 async function reply(
   interaction: ChatInputCommandInteraction,

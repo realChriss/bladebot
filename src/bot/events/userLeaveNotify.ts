@@ -1,7 +1,7 @@
 import ClientEvent from "../classes/ClientEvent";
 import { Events, GuildMember } from "discord.js";
 import Logger from "../../utils/Logger";
-import MessageSender from "../classes/MessageSender";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 
 const event: ClientEvent = {
   name: Events.GuildMemberRemove,
