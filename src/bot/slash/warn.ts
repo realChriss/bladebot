@@ -6,7 +6,6 @@ import {
   SendableChannels,
   SlashCommandBuilder,
 } from "discord.js";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Table from "easy-table";

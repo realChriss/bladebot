@@ -1,4 +1,3 @@
-import { TEventCollection } from "./types/EventCollection";
 import path from "node:path";
 import fs from "node:fs";
 import ClientEvent from "./classes/ClientEvent";

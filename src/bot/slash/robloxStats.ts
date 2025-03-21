@@ -6,9 +6,7 @@ import {
 } from "discord.js";
 import axios from "axios";
 import MessageSender from "../classes/MessageSender";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import ClientSlash from "../classes/ClientSlash";
-import { TMessageReplyPayload } from "../types/MsgReplyPayload";
 import Logger from "../../utils/Logger";
 
 interface RobloxUserData {

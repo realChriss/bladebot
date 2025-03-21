@@ -1,11 +1,4 @@
 import { Message, SendableChannels } from "discord.js";
-import { IMessageSender } from "../types/MessageSender";
-import { TMessageEmbedFields } from "../types/MsgEmbedFields";
-import { TMessageReplyOptions } from "../types/MsgReplyOptions";
-import { TMessageReplyPayload } from "../types/MsgReplyPayload";
-import { EMessageReplyState } from "../types/MsgReplyState";
-import { TMessageEmbed } from "../types/MsgEmbed";
-
 import Logger from "../../utils/Logger";
 
 export default class MessageSender implements IMessageSender {

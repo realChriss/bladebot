@@ -1,7 +1,3 @@
-import { IClientCommand } from "../types/ClientCommand";
-import { TCommandFunction } from "../types/CommandFunction";
-import { TCommandOptions } from "../types/CommandOptions";
-
 export default class ClientCommand implements IClientCommand {
   readonly command: TCommandFunction;
   readonly aliases: string[];

@@ -2,9 +2,7 @@ import ClientEvent from "../classes/ClientEvent";
 import { Events, Interaction } from "discord.js";
 import prisma from "../../db/prisma";
 import MessageSender from "../classes/MessageSender";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import Logger from "../../utils/Logger";
-import { TMessageEmbed } from "../types/MsgEmbed";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,

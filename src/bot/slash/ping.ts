@@ -5,7 +5,6 @@ import {
   SendableChannels,
   SlashCommandBuilder,
 } from "discord.js";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import ClientSlash from "../classes/ClientSlash";
 
 const command: ClientSlash = {

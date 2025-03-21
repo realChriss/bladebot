@@ -9,7 +9,6 @@ import {
 } from "discord.js";
 import Logger from "../../utils/Logger";
 import MessageSender from "../classes/MessageSender";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import { saveUserInput } from "../stores/applyModalStore";
 import prisma from "../../db/prisma";
 import ConfigManager from "../../utils/ConfigManager";

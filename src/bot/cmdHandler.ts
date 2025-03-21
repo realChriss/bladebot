@@ -6,12 +6,6 @@ import ClientCommand from "./classes/ClientCommand";
 import client from "./client";
 import MessageSender from "./classes/MessageSender";
 import { Channel, GuildMember, Message, PermissionFlagsBits } from "discord.js";
-import { TCommandValidations } from "./types/CommandValidations";
-import { TCommandCollection } from "./types/CommandCollection";
-import { TCooldownRemovalQueue } from "./types/CooldownRemovalQueue";
-import { TMessageReplyPayload } from "./types/MsgReplyPayload";
-import { TMessageReplyOptions } from "./types/MsgReplyOptions";
-import { EMessageReplyState } from "./types/MsgReplyState";
 
 class CooldownManager {
   private static users = new Map<string, number>();

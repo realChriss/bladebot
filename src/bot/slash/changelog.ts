@@ -6,7 +6,6 @@ import {
 } from "discord.js";
 import ClientSlash from "../classes/ClientSlash";
 import MessageSender from "../classes/MessageSender";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import Logger from "../../utils/Logger";
 
 interface GitCommit {

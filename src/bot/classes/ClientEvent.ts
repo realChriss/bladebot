@@ -1,6 +1,3 @@
-import { IClientEvent } from "../types/ClientEvent";
-import { TEventRun } from "../types/EventRun";
-
 export default class ClientEvent implements IClientEvent {
   readonly name: string;
   readonly run: TEventRun;

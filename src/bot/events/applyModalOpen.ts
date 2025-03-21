@@ -3,7 +3,6 @@ import { ButtonInteraction, Events, Interaction } from "discord.js";
 import { getUserInput } from "../stores/applyModalStore";
 import prisma from "../../db/prisma";
 import MessageSender from "../classes/MessageSender";
-import { EMessageReplyState } from "../types/MsgReplyState";
 
 const cancelApplicationButton = {
   type: 1,

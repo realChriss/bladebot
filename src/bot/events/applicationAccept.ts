@@ -8,7 +8,6 @@ import {
 } from "discord.js";
 import prisma from "../../db/prisma";
 import MessageSender from "../classes/MessageSender";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import Logger from "../../utils/Logger";
 import ConfigManager from "../../utils/ConfigManager";
 import {
@@ -18,7 +17,6 @@ import {
   getApplication,
 } from "../../utils/applicationActionUtils";
 import { application } from "@prisma/client";
-import { TMessageReplyPayload } from "../types/MsgReplyPayload";
 
 async function sendPendingInvite(
   interaction: ButtonInteraction,

@@ -7,7 +7,6 @@ import {
 } from "discord.js";
 import MessageSender from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import prisma from "../../db/prisma";
 
 async function getApplication(interaction: ButtonInteraction) {

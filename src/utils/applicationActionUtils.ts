@@ -1,7 +1,6 @@
 import { ButtonInteraction, GuildMember } from "discord.js";
 import { application } from "@prisma/client";
 import Logger from "./Logger";
-import { TMessageEmbed } from "../bot/types/MsgEmbed";
 import prisma from "../db/prisma";
 
 export async function getApplication(

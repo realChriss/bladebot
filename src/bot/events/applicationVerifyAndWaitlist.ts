@@ -1,8 +1,6 @@
 import ClientEvent from "../classes/ClientEvent";
 import { Events, Interaction, ButtonInteraction } from "discord.js";
-import prisma from "../../db/prisma";
 import MessageSender from "../classes/MessageSender";
-import { EMessageReplyState } from "../types/MsgReplyState";
 import {
   getAppliedMember,
   getApplication,

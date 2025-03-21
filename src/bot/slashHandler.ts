@@ -10,10 +10,7 @@ import {
   PermissionFlagsBits,
   RESTPostAPIApplicationCommandsJSONBody,
 } from "discord.js";
-import { TCooldownRemovalQueue } from "./types/CooldownRemovalQueue";
 import ClientSlash from "./classes/ClientSlash";
-import { TSlashCollection } from "./types/SlashCollection";
-import { TSlashValidations } from "./types/SlashValidations";
 
 class CooldownManager {
   private static users = new Map<string, number>();

@@ -1,6 +1,4 @@
-import { TSlashFunction } from "../types/SlashFunction";
 import { SlashCommandBuilder } from "discord.js";
-import { TSlashOptions } from "../types/SlashOptions";
 
 export default class ClientSlash {
   readonly exec: TSlashFunction;

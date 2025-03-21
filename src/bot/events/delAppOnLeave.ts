@@ -2,7 +2,6 @@ import ClientEvent from "../classes/ClientEvent";
 import { Events, GuildMember, GuildTextBasedChannel } from "discord.js";
 import Logger from "../../utils/Logger";
 import prisma from "../../db/prisma";
-import { TMessageEmbed } from "../types/MsgEmbed";
 
 async function getApplication(userId: string) {
   const application = await prisma.application.findFirst({
