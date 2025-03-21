@@ -1,1 +1,0 @@
-npx prisma db push

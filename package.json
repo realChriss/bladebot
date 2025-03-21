@@ -7,7 +7,8 @@
     "prod": "STATE=\"prod\" npx ts-node src/index.ts",
     "build": "esbuild \"src/**/*\" --outdir=dist --platform=node --target=node14 --format=cjs",
     "pretty": "prettier --write .",
-    "test": "npx tsc --noEmit"
+    "test": "npx tsc --noEmit",
+    "db-push": "prisma db push"
   },
   "author": "",
   "license": "ISC",
