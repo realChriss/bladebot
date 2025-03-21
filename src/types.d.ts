@@ -172,8 +172,23 @@ declare global {
     sendMessage(): Promise<Message | Error>;
   }
 
-  // Other Types
+  // Cooldown Manager Types
   type TCooldownRemovalQueue = {
     [query: string]: NodeJS.Timeout | number;
   };
+
+  // Changelog Types
+  interface GitCommit {
+    hash: string;
+    author: string;
+    date: string;
+    message: string;
+  }
+
+  interface RepoInfo {
+    currentBranch: string;
+    repoUrl: string;
+    commitCount: string;
+    currentCommit: string;
+  }
 }

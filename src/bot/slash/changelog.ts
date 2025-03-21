@@ -8,19 +8,6 @@ import ClientSlash from "../classes/ClientSlash";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 
-interface GitCommit {
-  hash: string;
-  author: string;
-  date: string;
-  message: string;
-}
-
-interface RepoInfo {
-  currentBranch: string;
-  repoUrl: string;
-  commitCount: string;
-}
-
 function getGitCommits(count: number = 5): GitCommit[] {
   try {
     const gitLogCommand = `git log -n ${count} --pretty=format:"%h|%an|%ad|%s" --date=short`;
@@ -54,6 +41,10 @@ function getRepoInfo(): RepoInfo {
       encoding: "utf-8",
     }).trim();
 
+    const currentCommit = execSync("git rev-parse HEAD", {
+      encoding: "utf-8",
+    }).trim();
+
     const repoUrl = execSync("git config --get remote.origin.url", {
       encoding: "utf-8",
     })
@@ -65,6 +56,7 @@ function getRepoInfo(): RepoInfo {
       currentBranch,
       repoUrl,
       commitCount,
+      currentCommit,
     };
   } catch (error) {
     Logger.error(`Failed to get repo info: ${error}`);
@@ -72,6 +64,7 @@ function getRepoInfo(): RepoInfo {
       currentBranch: "unknown",
       repoUrl: "unknown",
       commitCount: "0",
+      currentCommit: "unknown",
     };
   }
 }
@@ -117,7 +110,8 @@ const command: ClientSlash = {
       {
         title: "📝 Changelog",
         description: [
-          `**Branch:** \`${repoInfo.currentBranch}\``,
+          `**Branch:** ${repoInfo.currentBranch}`,
+          `**Current Commit:** \`${repoInfo.currentCommit}\``,
           `**Repository:** [View on GitHub](${repoInfo.repoUrl})`,
           `**Total Commits:** \`${repoInfo.commitCount}\``,
           "\n**Recent Commits:**",
