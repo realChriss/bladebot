@@ -4,7 +4,7 @@ import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import {
   getAppliedMember,
   getApplication,
-} from "../../utils/applicationActionUtils";
+} from "../../utils/ApplicationActionUtils";
 
 async function handleApplicationVerifyAndWaitlist(
   interaction: ButtonInteraction,

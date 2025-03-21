@@ -8,7 +8,7 @@ import {
   updateOriginalEmbed,
   getAppliedMember,
   getApplication,
-} from "../../utils/applicationActionUtils";
+} from "../../utils/ApplicationActionUtils";
 
 async function handleApplicationDelete(interaction: ButtonInteraction) {
   await interaction.deferReply();

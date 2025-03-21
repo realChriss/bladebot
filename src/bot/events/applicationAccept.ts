@@ -15,7 +15,7 @@ import {
   updateOriginalEmbed,
   getAppliedMember,
   getApplication,
-} from "../../utils/applicationActionUtils";
+} from "../../utils/ApplicationActionUtils";
 import { application } from "@prisma/client";
 
 async function sendPendingInvite(
