@@ -124,84 +124,84 @@ const components = [
   },
 ];
 
-async function handleApplicationAccept(interaction: ButtonInteraction) {
-  await interaction.deferReply();
-
-  const application = await getApplication(interaction);
-  if (!application) {
-    return;
-  }
-
-  const appliedMember = await getAppliedMember(interaction, application);
-  if (!appliedMember) {
-    return;
-  }
-
-  const mainChat = interaction.guild?.channels.cache.get(
-    process.env.MAIN_CHANNEL!,
-  );
-  if (!mainChat || !mainChat.isSendable()) {
-    Logger.error("Main chat not found");
-  }
-
-  await appliedMember.roles.add(process.env.CLAN_ROLE!);
-
-  const embedContent: TMessageReplyPayload = {
-    authorName: process.env.CLAN_NAME,
-    title: "You have been accepted",
-    description: `You are now a part of **${process.env.CLAN_NAME}**`,
-    footerText: "You will be added to the Bladeball clan shortly",
-  };
-  const dmEmbed = new MessageSender(null, embedContent, {
-    state: EMessageReplyState.success,
-  }).getEmbed();
-
-  await sendDMWithFallback(appliedMember, dmEmbed, async () => {
-    if (mainChat && mainChat.isSendable()) {
-      await new MessageSender(
-        mainChat as SendableChannels,
-        {
-          messageContent: appliedMember.toString(),
-          ...embedContent,
-        },
-        { state: EMessageReplyState.success },
-      ).sendMessage();
-    }
-  });
-
-  const embed = new MessageSender(
-    null,
-    {
-      authorImg: appliedMember.displayAvatarURL(),
-      authorName: appliedMember.displayName,
-      description: `Accepted **${appliedMember.user.username}**'s application`,
-      footerText: interaction.user.username,
-    },
-    { state: EMessageReplyState.success },
-  ).getEmbed();
-
-  await interaction.editReply({
-    embeds: [embed],
-  });
-
-  await updateOriginalEmbed(
-    interaction,
-    `Accepted by ${interaction.member?.user.username}`,
-    0x04ff00,
-  );
-
-  await sendPendingInvite(interaction, application, appliedMember);
-  await updateNickname(interaction, appliedMember, application);
-  await sendWelcomeMessage(interaction, appliedMember, application);
-}
-
 const event: ClientEvent = {
   name: Events.InteractionCreate,
   run: async (interaction: Interaction) => {
-    if (!interaction.isButton()) return;
-    if (interaction.customId === "application_accept") {
-      await handleApplicationAccept(interaction);
+    if (
+      !interaction.isButton() ||
+      interaction.customId === "application_accept"
+    ) {
+      return;
     }
+
+    await interaction.deferReply();
+
+    const application = await getApplication(interaction);
+    if (!application) {
+      return;
+    }
+
+    const appliedMember = await getAppliedMember(interaction, application);
+    if (!appliedMember) {
+      return;
+    }
+
+    const mainChat = interaction.guild?.channels.cache.get(
+      process.env.MAIN_CHANNEL!,
+    );
+    if (!mainChat || !mainChat.isSendable()) {
+      Logger.error("Main chat not found");
+    }
+
+    await appliedMember.roles.add(process.env.CLAN_ROLE!);
+
+    const embedContent: TMessageReplyPayload = {
+      authorName: process.env.CLAN_NAME,
+      title: "You have been accepted",
+      description: `You are now a part of **${process.env.CLAN_NAME}**`,
+      footerText: "You will be added to the Bladeball clan shortly",
+    };
+    const dmEmbed = new MessageSender(null, embedContent, {
+      state: EMessageReplyState.success,
+    }).getEmbed();
+
+    await sendDMWithFallback(appliedMember, dmEmbed, async () => {
+      if (mainChat && mainChat.isSendable()) {
+        await new MessageSender(
+          mainChat as SendableChannels,
+          {
+            messageContent: appliedMember.toString(),
+            ...embedContent,
+          },
+          { state: EMessageReplyState.success },
+        ).sendMessage();
+      }
+    });
+
+    const embed = new MessageSender(
+      null,
+      {
+        authorImg: appliedMember.displayAvatarURL(),
+        authorName: appliedMember.displayName,
+        description: `Accepted **${appliedMember.user.username}**'s application`,
+        footerText: interaction.user.username,
+      },
+      { state: EMessageReplyState.success },
+    ).getEmbed();
+
+    await interaction.editReply({
+      embeds: [embed],
+    });
+
+    await updateOriginalEmbed(
+      interaction,
+      `Accepted by ${interaction.member?.user.username}`,
+      0x04ff00,
+    );
+
+    await sendPendingInvite(interaction, application, appliedMember);
+    await updateNickname(interaction, appliedMember, application);
+    await sendWelcomeMessage(interaction, appliedMember, application);
   },
 };
 
