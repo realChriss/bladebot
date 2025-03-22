@@ -3,7 +3,7 @@ set -e
 rm -rf ./dist
 npm run build
 
-COMMIT_HASH=$(git rev-parse HEAD)
+COMMIT_HASH=$(git rev-parse --short HEAD)
 BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
 
 echo "{
