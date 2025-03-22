@@ -64,7 +64,7 @@ const event: ClientEvent = {
       {
         authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.displayName,
-        description: `Rejected **${appliedMember.user.username}**'s application`,
+        description: `❌ Rejected **${appliedMember.user.username}**'s application`,
         footerText: interaction.user.username,
       },
       { state: EMessageReplyState.success },

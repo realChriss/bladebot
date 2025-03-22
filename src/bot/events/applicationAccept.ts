@@ -129,7 +129,7 @@ const event: ClientEvent = {
   run: async (interaction: Interaction) => {
     if (
       !interaction.isButton() ||
-      interaction.customId === "application_accept"
+      interaction.customId !== "application_accept"
     ) {
       return;
     }
@@ -183,7 +183,7 @@ const event: ClientEvent = {
       {
         authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.displayName,
-        description: `Accepted **${appliedMember.user.username}**'s application`,
+        description: `✅ Accepted **${appliedMember.user.username}**'s application`,
         footerText: interaction.user.username,
       },
       { state: EMessageReplyState.success },

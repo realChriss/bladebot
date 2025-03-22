@@ -39,7 +39,7 @@ const event: ClientEvent = {
       {
         authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.displayName,
-        description: `Verified and waitlisted **${appliedMember.user.username}**`,
+        description: `👤 Verified and waitlisted **${appliedMember.user.username}**`,
         footerText: interaction.user.username,
       },
       { state: EMessageReplyState.success },

@@ -65,7 +65,7 @@ const event: ClientEvent = {
       {
         authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.displayName,
-        description: `Deleted **${appliedMember.user.username}**'s application`,
+        description: `🗑️ Deleted **${appliedMember.user.username}**'s application`,
         footerText: interaction.user.username,
       },
       { state: EMessageReplyState.success },
