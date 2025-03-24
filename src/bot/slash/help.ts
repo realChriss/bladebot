@@ -25,7 +25,7 @@ function formatCommandList(commands: Map<string, ClientSlash>): CommandInfo[] {
     };
 
     const subcommands = command.data.options.filter(
-      (opt) => opt.toJSON().type === 1
+      (opt) => opt.toJSON().type === 1,
     );
 
     if (subcommands.length > 0) {
@@ -68,7 +68,7 @@ const command: ClientSlash = {
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     const commands = SlashHandler.getCommands();
     const formattedCommands = formatCommandList(commands);
-    
+
     const helpEmbed = new MessageSender(
       null,
       {
@@ -77,7 +77,7 @@ const command: ClientSlash = {
         footerText: interaction.user.username,
         color: 0x5865f2,
       },
-      { state: EMessageReplyState.none }
+      { state: EMessageReplyState.none },
     );
 
     await interaction.reply({
