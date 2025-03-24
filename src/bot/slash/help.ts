@@ -86,9 +86,8 @@ const command: ClientSlash = {
   },
   options: {
     isDisabled: false,
-    onlyBotChannel: false,
+    onlyBotChannel: true,
     allowEveryone: true,
-    cooldown: 5,
   },
 };
 
