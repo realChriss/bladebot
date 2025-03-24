@@ -177,7 +177,7 @@ function createErrorEmbed(
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
     .setName("roblox-stats")
-    .setDescription("Fetches Roblox profile data for a given username.")
+    .setDescription("Fetches Roblox profile data for a given username")
     .addStringOption((option) =>
       option
         .setName("username")

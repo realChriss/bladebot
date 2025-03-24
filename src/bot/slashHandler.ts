@@ -83,6 +83,10 @@ export default class SlashHandler {
     await client.application?.commands.set(commandsToRegister);
   }
 
+  public static getCommands() {
+    return this.commands;
+  }
+
   public static async processCommand(
     interaction: ChatInputCommandInteraction,
   ): Promise<void> {
