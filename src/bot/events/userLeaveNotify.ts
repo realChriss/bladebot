@@ -27,11 +27,11 @@ const event: ClientEvent = {
     const embed = new MessageSender(
       applicationChannel,
       {
+        authorName: member.user.username,
+        authorImg: member.user.displayAvatarURL({ size: 128 }),
         title: "Clan Member Left",
         description: `Clan member **${member.displayName}** has left the server.\n\nPing: ${member.toString()}\nDisplay Name: \`${member.displayName}\`\nUser ID: \`${member.id}\``,
         thumbnail: member.user.displayAvatarURL({ size: 128 }),
-        authorImg: member.user.displayAvatarURL({ size: 128 }),
-        authorName: member.user.username,
         color: 0xffbe01,
       },
       {

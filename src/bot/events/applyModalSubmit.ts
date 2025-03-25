@@ -288,7 +288,7 @@ const event: ClientEvent = {
       const applicationEmbed = new MessageSender(
         channel,
         {
-          authorName: member?.user.username,
+          authorName: member?.displayName,
           authorImg: getAvatar(member, 128),
           title: "New Application",
           fields: [
