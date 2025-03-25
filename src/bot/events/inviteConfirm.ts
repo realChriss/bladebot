@@ -102,7 +102,7 @@ const event: ClientEvent = {
         null,
         {
           authorImg: appliedMember.displayAvatarURL(),
-          authorName: appliedMember.displayName,
+          authorName: appliedMember.user.displayName,
           description: `Sent confirmation to **${appliedMember.user.username}**`,
           footerText: interaction.user.username,
         },
