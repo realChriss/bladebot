@@ -97,49 +97,50 @@ function userHasClanRole(interaction: ButtonInteraction) {
 const event: ClientEvent = {
   name: Events.InteractionCreate,
   run: async (interaction: Interaction) => {
-    if (!interaction.isButton()) {
+    if (
+      !interaction.isButton() ||
+      interaction.customId !== "apply_modal_open"
+    ) {
       return;
     }
 
-    if (interaction.customId === "apply_modal_open") {
-      if (userHasClanRole(interaction)) {
-        await interaction.reply({
-          content: "You are already in the clan",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const application = await prisma.application.findFirst({
-        where: {
-          user_id: interaction.member?.user.id,
-        },
+    if (userHasClanRole(interaction)) {
+      await interaction.reply({
+        content: "You are already in the clan",
+        ephemeral: true,
       });
-
-      if (application) {
-        const embed = new MessageSender(
-          null,
-          {
-            title: "Warning",
-            description:
-              "You already have a pending application.\nYou can cancel it using the button below",
-          },
-          { state: EMessageReplyState.error },
-        ).getEmbed();
-
-        await interaction.reply({
-          embeds: [embed],
-          components: [cancelApplicationButton],
-          ephemeral: true,
-        });
-        return;
-      }
-
-      await interaction.showModal(
-        createPrefilledModal(interaction.member?.user.id!),
-      );
       return;
     }
+
+    const application = await prisma.application.findFirst({
+      where: {
+        user_id: interaction.member?.user.id,
+      },
+    });
+
+    if (application) {
+      const embed = new MessageSender(
+        null,
+        {
+          title: "Warning",
+          description:
+            "You already have a pending application.\nYou can cancel it using the button below",
+        },
+        { state: EMessageReplyState.error },
+      ).getEmbed();
+
+      await interaction.reply({
+        embeds: [embed],
+        components: [cancelApplicationButton],
+        ephemeral: true,
+      });
+      return;
+    }
+
+    await interaction.showModal(
+      createPrefilledModal(interaction.member?.user.id!),
+    );
+    return;
   },
 };
 

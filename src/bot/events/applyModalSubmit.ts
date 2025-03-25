@@ -219,155 +219,156 @@ async function validate(
 const event: ClientEvent = {
   name: Events.InteractionCreate,
   run: async (interaction: Interaction) => {
-    if (!interaction.isModalSubmit()) {
+    if (
+      !interaction.isModalSubmit() ||
+      interaction.customId !== "robloxUserModal"
+    ) {
       return;
     }
 
-    if (interaction.customId === "robloxUserModal") {
-      await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
 
-      if (userHasClanRole(interaction)) {
+    if (userHasClanRole(interaction)) {
+      await interaction.editReply({
+        content: "❌ You are already in the clan",
+      });
+      return;
+    }
+
+    const robloxUsername =
+      interaction.fields.getTextInputValue("robloxUsername");
+    const age = interaction.fields
+      .getTextInputValue("age")
+      .replace(/[.,]/g, "");
+    const killCount = interaction.fields
+      .getTextInputValue("killCount")
+      .replace(/[.,]/g, "");
+    const winCount = interaction.fields
+      .getTextInputValue("winCount")
+      .replace(/[.,]/g, "");
+
+    const application = await prisma.application.findFirst({
+      where: {
+        user_id: interaction.member?.user.id,
+      },
+    });
+
+    if (application) {
+      await interaction.editReply({
+        content: "You have already applied",
+      });
+      return;
+    }
+
+    const validation = await validate(
+      interaction.member?.user.id!,
+      interaction.member?.user.username!,
+      robloxUsername,
+      age,
+      killCount,
+      winCount,
+    );
+
+    if (validation.valid) {
+      const channel = interaction.guild?.channels.cache.get(
+        process.env.APPLICATION_CHANNEL!,
+      );
+
+      if (!channel || !channel.isSendable()) {
+        Logger.error("❌ Application channel not found");
         await interaction.editReply({
-          content: "❌ You are already in the clan",
+          content: "Error: Application Channel not found",
         });
         return;
       }
 
-      const robloxUsername =
-        interaction.fields.getTextInputValue("robloxUsername");
-      const age = interaction.fields
-        .getTextInputValue("age")
-        .replace(/[.,]/g, "");
-      const killCount = interaction.fields
-        .getTextInputValue("killCount")
-        .replace(/[.,]/g, "");
-      const winCount = interaction.fields
-        .getTextInputValue("winCount")
-        .replace(/[.,]/g, "");
+      const member = interaction.member as GuildMember;
+      const robloxAvatar = await getRobloxAvatar(robloxUsername);
 
-      const application = await prisma.application.findFirst({
-        where: {
-          user_id: interaction.member?.user.id,
+      const applicationEmbed = new MessageSender(
+        channel,
+        {
+          authorName: member?.user.username,
+          authorImg: getAvatar(member, 128),
+          title: "New Application",
+          fields: [
+            {
+              name: "Discord User",
+              value: `Username: \`${member.user.username}\`\nDisplay Name: \`${member.displayName}\`\nPing: ${member.toString()}`,
+            },
+            {
+              name: "Roblox User",
+              value: `Username: \`${robloxUsername}\``,
+            },
+            { name: "Age", value: `${age}` },
+            { name: "Kill Count", value: `${killCount}` },
+            { name: "Win Count", value: `${winCount}` },
+          ],
+          thumbnail: getAvatar(member, 512),
+          image: robloxAvatar?.avatar || undefined,
+          color: 0xffffff,
+        },
+        {
+          state: EMessageReplyState.none,
+        },
+      ).getEmbed();
+
+      const applicationMsg = await channel.send({
+        embeds: [applicationEmbed],
+        components: getComponents(interaction.guildId!),
+      });
+
+      await prisma.application.create({
+        data: {
+          user_id: member.id,
+          msg_id: applicationMsg.id,
+          discord_user: member.user.username,
+          roblox_user: robloxUsername,
+          age: parseInt(age),
+          kill: parseInt(killCount),
+          win: parseInt(winCount),
+          roblox_avatar_url: robloxAvatar?.avatar,
+          roblox_headshot_url: robloxAvatar?.headshot,
         },
       });
 
-      if (application) {
-        await interaction.editReply({
-          content: "You have already applied",
-        });
-        return;
-      }
+      const response = (await ConfigManager.isAppOpen())
+        ? "✅ Application submitted!\n\n" +
+          "**What's next?**\n" +
+          "• Your application will be reviewed by our staff team\n" +
+          "• You'll receive a response via DM from this bot\n\n" +
+          "Please ensure you have DMs enabled for this server"
+        : "Applications are currently closed.\nYou have been placed on the **waitlist**";
 
-      const validation = await validate(
-        interaction.member?.user.id!,
-        interaction.member?.user.username!,
-        robloxUsername,
-        age,
-        killCount,
-        winCount,
-      );
+      const responseEmbed = new MessageSender(
+        null,
+        {
+          description: response,
+          thumbnail: robloxAvatar?.headshot,
+          footerText: "-> To cancel your application, press on apply again",
+        },
+        { state: EMessageReplyState.success },
+      ).getEmbed();
 
-      if (validation.valid) {
-        const channel = interaction.guild?.channels.cache.get(
-          process.env.APPLICATION_CHANNEL!,
-        );
+      await interaction.editReply({
+        embeds: [responseEmbed],
+      });
+    } else {
+      const errorFields = validation
+        .errors!.map((err) => `**${err.field}**: ${err.hint}`)
+        .join("\n");
 
-        if (!channel || !channel.isSendable()) {
-          Logger.error("❌ Application channel not found");
-          await interaction.editReply({
-            content: "Error: Application Channel not found",
-          });
-          return;
-        }
+      const responseEmbed = new MessageSender(
+        null,
+        {
+          description: `Please fix the following errors:\n\n${errorFields}`,
+        },
+        { state: EMessageReplyState.error },
+      ).getEmbed();
 
-        const member = interaction.member as GuildMember;
-        const robloxAvatar = await getRobloxAvatar(robloxUsername);
-
-        const applicationEmbed = new MessageSender(
-          channel,
-          {
-            authorName: member?.user.username,
-            authorImg: getAvatar(member, 128),
-            title: "New Application",
-            fields: [
-              {
-                name: "Discord User",
-                value: `Username: \`${member.user.username}\`\nDisplay Name: \`${member.displayName}\`\nPing: ${member.toString()}`,
-              },
-              {
-                name: "Roblox User",
-                value: `Username: \`${robloxUsername}\``,
-              },
-              { name: "Age", value: `${age}` },
-              { name: "Kill Count", value: `${killCount}` },
-              { name: "Win Count", value: `${winCount}` },
-            ],
-            thumbnail: getAvatar(member, 512),
-            image: robloxAvatar?.avatar || undefined,
-            color: 0xffffff,
-          },
-          {
-            state: EMessageReplyState.none,
-          },
-        ).getEmbed();
-
-        const applicationMsg = await channel.send({
-          embeds: [applicationEmbed],
-          components: getComponents(interaction.guildId!),
-        });
-
-        await prisma.application.create({
-          data: {
-            user_id: member.id,
-            msg_id: applicationMsg.id,
-            discord_user: member.user.username,
-            roblox_user: robloxUsername,
-            age: parseInt(age),
-            kill: parseInt(killCount),
-            win: parseInt(winCount),
-            roblox_avatar_url: robloxAvatar?.avatar,
-            roblox_headshot_url: robloxAvatar?.headshot,
-          },
-        });
-
-        const response = (await ConfigManager.isAppOpen())
-          ? "✅ Application submitted!\n\n" +
-            "**What's next?**\n" +
-            "• Your application will be reviewed by our staff team\n" +
-            "• You'll receive a response via DM from this bot\n\n" +
-            "Please ensure you have DMs enabled for this server"
-          : "Applications are currently closed.\nYou have been placed on the **waitlist**";
-
-        const responseEmbed = new MessageSender(
-          null,
-          {
-            description: response,
-            thumbnail: robloxAvatar?.headshot,
-            footerText: "-> To cancel your application, press on apply again",
-          },
-          { state: EMessageReplyState.success },
-        ).getEmbed();
-
-        await interaction.editReply({
-          embeds: [responseEmbed],
-        });
-      } else {
-        const errorFields = validation
-          .errors!.map((err) => `**${err.field}**: ${err.hint}`)
-          .join("\n");
-
-        const responseEmbed = new MessageSender(
-          null,
-          {
-            description: `Please fix the following errors:\n\n${errorFields}`,
-          },
-          { state: EMessageReplyState.error },
-        ).getEmbed();
-
-        await interaction.editReply({
-          embeds: [responseEmbed],
-        });
-      }
+      await interaction.editReply({
+        embeds: [responseEmbed],
+      });
     }
   },
 };

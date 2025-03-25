@@ -7,8 +7,12 @@ import Logger from "../../utils/Logger";
 const event: ClientEvent = {
   name: Events.InteractionCreate,
   run: async (interaction: Interaction) => {
-    if (!interaction.isButton()) return;
-    if (interaction.customId !== "application_cancel") return;
+    if (
+      !interaction.isButton() ||
+      interaction.customId !== "application_cancel"
+    ) {
+      return;
+    }
 
     await interaction.deferUpdate();
 
