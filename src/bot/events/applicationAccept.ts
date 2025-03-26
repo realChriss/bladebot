@@ -154,6 +154,7 @@ const event: ClientEvent = {
     }
 
     await appliedMember.roles.add(process.env.CLAN_ROLE!);
+    await appliedMember.roles.remove(process.env.WAITLIST_ROLE!);
 
     const embedContent: TMessageReplyPayload = {
       authorName: process.env.CLAN_NAME,
