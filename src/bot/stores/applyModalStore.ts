@@ -1,4 +1,11 @@
-const userInputStore = new Map();
+const userInputStore = new Map<string, ApplyStore>();
+
+interface ApplyStore {
+  robloxUsername: string;
+  age: string;
+  killCount: string;
+  winCount: string;
+}
 
 export function saveUserInput(
   userId: string,
