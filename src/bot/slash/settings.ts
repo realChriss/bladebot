@@ -53,10 +53,10 @@ const command: ClientSlash = {
     .setName("settings")
     .setDescription("Configure bot settings")
     .addSubcommand((subcommand) =>
-      subcommand.setName("open").setDescription("Enables applications"),
+      subcommand.setName("open").setDescription("Opens applications"),
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName("close").setDescription("Disables applications"),
+      subcommand.setName("close").setDescription("Closes applications"),
     )
     .addSubcommand((subcommand) =>
       subcommand

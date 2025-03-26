@@ -353,11 +353,11 @@ async function warnListExec(interaction: ChatInputCommandInteraction) {
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
     .setName("warn")
-    .setDescription("Warn a member")
+    .setDescription("Warn system")
     .addSubcommand((subcommand) =>
       subcommand
         .setName("ap")
-        .setDescription("AP warn")
+        .setDescription("AP warn a member")
         .addUserOption((option) =>
           option
             .setName("target")
@@ -380,7 +380,7 @@ const command: ClientSlash = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName("donation")
-        .setDescription("Donation warn")
+        .setDescription("Donation warn a member")
         .addUserOption((option) =>
           option
             .setName("target")
@@ -423,7 +423,9 @@ const command: ClientSlash = {
         ),
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName("list").setDescription("List all warn"),
+      subcommand
+        .setName("list")
+        .setDescription("List all warns of clan members"),
     ) as SlashCommandBuilder,
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     switch (interaction.options.getSubcommand()) {
