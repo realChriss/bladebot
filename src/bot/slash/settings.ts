@@ -28,7 +28,7 @@ async function reply(
 
 const settingsMap: Record<
   string,
-  { action: () => Promise<void>; message: string }
+  { action: () => Promise<void | string> | void; message: string }
 > = {
   open: {
     action: () => ConfigManager.setAppOpen(true),
@@ -45,6 +45,18 @@ const settingsMap: Record<
   "disable-welcome": {
     action: () => ConfigManager.setWlcMsg(false),
     message: "Welcome message is now disabled",
+  },
+  show: {
+    action: async () => {
+      const config = await ConfigManager.getConfig();
+
+      if (!config) {
+        return "Failed to fetch settings";
+      }
+
+      return `Current Settings:\n• Applications: ${config.app_open ? "Open" : "Closed"}\n• Welcome Message: ${config.send_wlc_msg ? "Enabled" : "Disabled"}`;
+    },
+    message: "",
   },
 };
 
@@ -67,14 +79,17 @@ const command: ClientSlash = {
       subcommand
         .setName("disable-welcome")
         .setDescription("Disables welcome message"),
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("show").setDescription("Shows current settings"),
     ) as SlashCommandBuilder,
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     const subcommand = interaction.options.getSubcommand();
     const setting = settingsMap[subcommand];
 
     if (setting) {
-      await setting.action();
-      await reply(interaction, true, setting.message);
+      const result = await setting.action();
+      await reply(interaction, true, result || setting.message);
     } else {
       await reply(interaction, false, "Invalid subcommand.");
     }
