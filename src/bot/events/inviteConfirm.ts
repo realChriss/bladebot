@@ -8,6 +8,7 @@ import {
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 import prisma from "../../db/prisma";
+import { updateOriginalEmbed } from "../../utils/ApplicationActionUtils";
 
 async function getApplication(interaction: ButtonInteraction) {
   const application = await prisma.application.findFirst({
@@ -87,19 +88,6 @@ const event: ClientEvent = {
       },
     });
 
-    await interaction.message.edit({
-      embeds: [
-        {
-          ...interaction.message.embeds[0].data,
-          footer: {
-            text: `Invited by ${interaction.member?.user.username}`,
-          },
-          color: 0x04ff00,
-        },
-      ],
-      components: [],
-    });
-
     const embed = new MessageSender(
       null,
       {
@@ -114,6 +102,12 @@ const event: ClientEvent = {
     await interaction.editReply({
       embeds: [embed],
     });
+
+    await updateOriginalEmbed(
+      interaction,
+      `Invited by ${interaction.member?.user.username}`,
+      0x04ff00,
+    );
   },
 };
 
