@@ -93,7 +93,7 @@ const event: ClientEvent = {
       {
         authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.user.displayName,
-        description: `Sent confirmation to **${appliedMember.user.username}**`,
+        description: `✅ Sent confirmation to **${appliedMember.user.username}**`,
         footerText: interaction.user.username,
       },
       { state: EMessageReplyState.success },
