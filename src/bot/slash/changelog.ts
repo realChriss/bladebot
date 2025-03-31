@@ -123,7 +123,7 @@ const command: ClientSlash = {
     const description = [
       `**Build Branch:** ${buildVersion?.branch || "unknown"}`,
       `**Build Commit:** \`${buildVersion?.commit || "unknown"}\``,
-      `**Repository:** [View on GitHub 🡥](${repoInfo.repoUrl})`,
+      `**Repository:** [View on GitHub ↗](${repoInfo.repoUrl})`,
       "\n**Recent Commits:**",
       formatCommitsToMarkdown(commits),
     ];
