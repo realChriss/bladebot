@@ -9,19 +9,10 @@ import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 import path from "path";
 
-function getBuildVersion(): BuildVersion | null {
-  const buildInfoPath = path.join(__dirname, "..", "..", "build.json");
-  try {
-    const buildInfo = require(buildInfoPath);
+let cachedBuildVersion: BuildVersion | null = null;
 
-    return {
-      branch: buildInfo.branchName,
-      commit: buildInfo.commitHash,
-    };
-  } catch (error) {
-    Logger.warn(`Could not read build commit hash from file: ${error}`);
-    return null;
-  }
+function getBuildVersion() {
+  return cachedBuildVersion;
 }
 
 function getGitCommits(count: number = 5): GitCommit[] {
@@ -93,6 +84,23 @@ function formatCommitsToMarkdown(commits: GitCommit[]): string {
 
   return `\`\`\`md\n${formattedCommits}\`\`\``;
 }
+
+function initializeBuildVersion(): void {
+  const buildInfoPath = path.join(__dirname, "..", "..", "build.json");
+  try {
+    const buildInfo = require(buildInfoPath);
+    cachedBuildVersion = {
+      branch: buildInfo.branchName,
+      commit: buildInfo.commitHash,
+    };
+    Logger.info(`Initialized build version: ${cachedBuildVersion.branch}/${cachedBuildVersion.commit}`);
+  } catch (error) {
+    Logger.warn(`Could not read build commit hash from file: ${error}`);
+    cachedBuildVersion = null;
+  }
+}
+
+initializeBuildVersion();
 
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
