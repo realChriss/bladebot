@@ -11,8 +11,8 @@ import {
 import ClientSlash from "../classes/ClientSlash";
 import { getLastEval } from "../stores/evalModalStore";
 
-export const EVAL_MODAL_ID = 'eval_modal';
-export const EVAL_INPUT_ID = 'eval_input';
+export const EVAL_MODAL_ID = "eval_modal";
+export const EVAL_INPUT_ID = "eval_input";
 
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
@@ -23,17 +23,19 @@ const command: ClientSlash = {
 
     const modal = new ModalBuilder()
       .setCustomId(EVAL_MODAL_ID)
-      .setTitle('Evaluate JavaScript Code');
+      .setTitle("Evaluate JavaScript Code");
 
     const codeInput = new TextInputBuilder()
       .setCustomId(EVAL_INPUT_ID)
-      .setLabel('Enter your code')
+      .setLabel("Enter your code")
       .setStyle(TextInputStyle.Paragraph)
       .setValue(lastCode)
       .setRequired(true);
 
-    const actionRow = new ActionRowBuilder<ModalActionRowComponentBuilder>()
-      .addComponents(codeInput);
+    const actionRow =
+      new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+        codeInput,
+      );
 
     modal.addComponents(actionRow);
     await interaction.showModal(modal);

@@ -23,27 +23,29 @@ const event: ClientEvent = {
     }
 
     const executionTime = process.hrtime(startTime);
-    const msTime = (executionTime[0] * 1000 + executionTime[1] / 1e6).toFixed(2);
-
-    const resultStr = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
-    
-    const file = new AttachmentBuilder(
-      Buffer.from(code),
-      { name: 'eval-code.js' }
+    const msTime = (executionTime[0] * 1000 + executionTime[1] / 1e6).toFixed(
+      2,
     );
+
+    const resultStr =
+      typeof result === "string" ? result : JSON.stringify(result, null, 2);
+
+    const file = new AttachmentBuilder(Buffer.from(code), {
+      name: "eval-code.js",
+    });
 
     const embed = new MessageSender(
       null,
       {
-        title: 'Eval Result',
+        title: "Eval Result",
         description: `\`\`\`js\n${resultStr.slice(0, 2000)}\`\`\``,
         fields: [
-          { name: 'Type', value: `\`${typeof result}\``, inline: true },
-          { name: 'Execution Time', value: `\`${msTime}ms\``, inline: true },
+          { name: "Type", value: `\`${typeof result}\``, inline: true },
+          { name: "Execution Time", value: `\`${msTime}ms\``, inline: true },
         ],
         footerText: interaction.user.tag,
       },
-      { state: EMessageReplyState.success }
+      { state: EMessageReplyState.success },
     );
 
     await interaction.reply({

@@ -5,5 +5,5 @@ export function saveLastEval(userId: string, code: string) {
 }
 
 export function getLastEval(userId: string) {
-  return evalStore.get(userId) || '';
+  return evalStore.get(userId) || "";
 }

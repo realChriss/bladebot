@@ -10,7 +10,11 @@ import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Table from "easy-table";
 import { user_warn } from "@prisma/client";
-import { getWarnCounts, resolveTargetMember, sendDMorFallback } from "../../utils/WarnUtils";
+import {
+  getWarnCounts,
+  resolveTargetMember,
+  sendDMorFallback,
+} from "../../utils/WarnUtils";
 
 interface WarnConfig {
   warnTypeId: number;

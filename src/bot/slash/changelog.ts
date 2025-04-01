@@ -93,7 +93,9 @@ function initializeBuildVersion(): void {
       branch: buildInfo.branchName,
       commit: buildInfo.commitHash,
     };
-    Logger.info(`Initialized build version: ${cachedBuildVersion.branch}/${cachedBuildVersion.commit}`);
+    Logger.info(
+      `Initialized build version: ${cachedBuildVersion.branch}/${cachedBuildVersion.commit}`,
+    );
   } catch (error) {
     Logger.warn(`Could not read build commit hash from file: ${error}`);
     cachedBuildVersion = null;

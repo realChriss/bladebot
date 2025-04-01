@@ -1,6 +1,12 @@
-import { ChatInputCommandInteraction, GuildMember, SendableChannels } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  GuildMember,
+  SendableChannels,
+} from "discord.js";
 import prisma from "../db/prisma";
-import MessageSender, { EMessageReplyState } from "../bot/classes/MessageSender";
+import MessageSender, {
+  EMessageReplyState,
+} from "../bot/classes/MessageSender";
 
 export async function getWarnCounts(userId: string) {
   const warnCounts = await prisma.user_warn.groupBy({
@@ -27,7 +33,9 @@ export async function getWarnCounts(userId: string) {
   };
 }
 
-export async function resolveTargetMember(interaction: ChatInputCommandInteraction) {
+export async function resolveTargetMember(
+  interaction: ChatInputCommandInteraction,
+) {
   const targetUser = interaction.options.getUser("target");
   if (!targetUser) return null;
   return interaction.guild?.members.resolve(targetUser.id) ?? null;
