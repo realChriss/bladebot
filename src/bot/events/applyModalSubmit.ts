@@ -12,6 +12,7 @@ import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import { saveUserInput } from "../stores/applyModalStore";
 import prisma from "../../db/prisma";
 import ConfigManager from "../../utils/ConfigManager";
+import client from "../client";
 
 interface ValidationError {
   field: string;
@@ -216,6 +217,36 @@ async function validate(
   };
 }
 
+async function getDescription(): Promise<string> {
+  let text = "✅ Application submitted!\n\n"
+
+  if (await ConfigManager.isAppOpen()) {
+    text += "**What's next?**\n" +
+      "• Your application will be reviewed by our staff team\n" +
+      "• You'll receive a response via DM from this bot\n\n" +
+      "Please ensure you have DMs enabled for this server"
+  } else {
+    text += "Applications are currently closed.\n" + 
+      "You have been placed on the **waitlist**\n\n";
+
+    const server = client.guilds.cache.get(process.env.SERVER_ID!);
+    
+    if (server) {
+      const applicationCount = (await prisma.application.findMany({
+        where: {
+          pending_msg_id: null,
+        }
+      }))
+      .filter((application) => server.members.cache.get(application.user_id))
+      .length;
+  
+      text += `Your waitlist potition: **${applicationCount}**`
+    }
+  }
+
+  return text.trim();
+}
+
 const event: ClientEvent = {
   name: Events.InteractionCreate,
   run: async (interaction: Interaction) => {
@@ -332,18 +363,10 @@ const event: ClientEvent = {
         },
       });
 
-      const response = (await ConfigManager.isAppOpen())
-        ? "✅ Application submitted!\n\n" +
-          "**What's next?**\n" +
-          "• Your application will be reviewed by our staff team\n" +
-          "• You'll receive a response via DM from this bot\n\n" +
-          "Please ensure you have DMs enabled for this server"
-        : "Applications are currently closed.\nYou have been placed on the **waitlist**";
-
       const responseEmbed = new MessageSender(
         null,
         {
-          description: response,
+          description: await getDescription(),
           thumbnail: robloxAvatar?.headshot,
           footerText: "-> To cancel your application, press on apply again",
         },
