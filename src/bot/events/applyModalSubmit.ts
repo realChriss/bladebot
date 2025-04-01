@@ -246,7 +246,7 @@ async function getDescription(): Promise<string> {
           ?.roles.cache.has(process.env.WAITLIST_ROLE!),
       ).length + 1;
 
-      text += `Your waitlist potition: **${position}**`;
+      text += `Your waitlist position: **${position}**`;
     }
   }
 
