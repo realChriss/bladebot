@@ -14,8 +14,6 @@ const event: ClientEvent = {
       return;
     }
 
-    Logger.info(`Clan member ${member.displayName} left the server`);
-
     const applicationChannel = member.guild.channels.cache.get(
       process.env.APPLICATION_CHANNEL!,
     );
