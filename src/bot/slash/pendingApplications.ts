@@ -33,10 +33,12 @@ async function getApplicationsListString(
         const message = await fetchApplicationMessage(x.msg_id, interaction);
 
         const discordUser = interaction.guild?.members.cache.get(x.user_id);
-
+        
         if (!discordUser) {
           return null;
         }
+        
+        const waitlisted = discordUser.roles.cache.has(process.env.WAITLIST_ROLE!);
 
         return {
           username: discordUser.user.displayName,
@@ -45,6 +47,7 @@ async function getApplicationsListString(
             ? `<t:${Math.floor(message.createdTimestamp / 1000)}:R>`
             : "_No Time_",
           createdTimestamp: message?.createdTimestamp || 0,
+          waitlisted: waitlisted,	
         };
       }),
     )
@@ -52,7 +55,8 @@ async function getApplicationsListString(
     .filter((x) => x !== null)
     .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
     .map(
-      ({ username, url, timestamp }) => `${username} — ${timestamp} — ${url}`,
+      (data) => 
+        `${data.username} — ${data.timestamp} — ${data.url} ${data.waitlisted ? "— (waitlist)" : ""}`,
     )
     .join("\n");
 }
