@@ -75,9 +75,23 @@ const event: ClientEvent = {
         .reply({
           embeds: [embed],
         })
-        .catch(() => {
-          Logger.error("Failed to send reply to application message");
-          return null;
+        .catch((err) => {
+          embed.description = `Application of ${member.user.username} has been deleted due to leaving the server.`;
+
+          applicationMessage.channel
+            .send({
+              embeds: [embed],
+            })
+            .catch((err) => {
+              Logger.error(
+                "Failed to send message in application channel: " + err,
+              );
+              Logger.info(
+                `Application by ${member.user.username} has been deleted due to user leaving the server.`,
+              );
+            });
+
+          Logger.error("Failed to send reply to application message:" + err);
         });
     }
 
@@ -102,10 +116,6 @@ const event: ClientEvent = {
         });
       }
     }
-
-    Logger.info(
-      `Application by ${member.user.username} has been deleted due to user leaving the server.`,
-    );
   },
 };
 

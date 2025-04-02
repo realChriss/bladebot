@@ -234,17 +234,18 @@ async function getDescription(): Promise<string> {
     const server = client.guilds.cache.get(process.env.SERVER_ID!);
 
     if (server) {
-      const position = (
-        await prisma.application.findMany({
-          where: {
-            pending_msg_id: null,
-          },
-        })
-      ).filter((application) =>
-        server.members.cache
-          .get(application.user_id)
-          ?.roles.cache.has(process.env.WAITLIST_ROLE!),
-      ).length + 1;
+      const position =
+        (
+          await prisma.application.findMany({
+            where: {
+              pending_msg_id: null,
+            },
+          })
+        ).filter((application) =>
+          server.members.cache
+            .get(application.user_id)
+            ?.roles.cache.has(process.env.WAITLIST_ROLE!),
+        ).length + 1;
 
       text += `Your waitlist position: **${position}**`;
     }
