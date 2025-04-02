@@ -14,7 +14,7 @@ import {
   getWarnCounts,
   resolveTargetMember,
   sendDMorFallback,
-} from "../../utils/WarnUtils";
+} from "../../utils/warnUtils";
 
 interface WarnConfig {
   warnTypeId: number;

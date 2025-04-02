@@ -8,7 +8,7 @@ import {
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 import prisma from "../../db/prisma";
-import { updateOriginalEmbed } from "../../utils/ApplicationActionUtils";
+import { updateOriginalEmbed } from "../../utils/applicationActionUtils";
 
 async function getApplication(interaction: ButtonInteraction) {
   const application = await prisma.application.findFirst({

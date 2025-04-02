@@ -4,7 +4,7 @@ import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import {
   getAppliedMember,
   getApplication,
-} from "../../utils/ApplicationActionUtils";
+} from "../../utils/applicationActionUtils";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,

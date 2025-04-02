@@ -8,7 +8,7 @@ import {
   updateOriginalEmbed,
   getAppliedMember,
   getApplication,
-} from "../../utils/ApplicationActionUtils";
+} from "../../utils/applicationActionUtils";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
