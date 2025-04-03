@@ -1,4 +1,4 @@
-import { Events } from "discord.js";
+import { ActivityType, Events } from "discord.js";
 import client from "./client";
 import Logger from "../utils/Logger";
 import EventHandler from "./eventHandler";
@@ -14,19 +14,33 @@ client.on(Events.ClientReady, async () => {
   await client.guilds.cache.get(process.env.SERVER_ID!)?.roles.fetch();
   await client.guilds.cache.get(process.env.SERVER_ID!)?.channels.fetch();
 
-  initEvents();
+  await initEvents();
+  initRPC();
 
   Logger.info(`Client is ready \`${moment().format("HH:mm:ss DD.MM.YYYY")}\``);
 });
 
-function initEvents() {
-  SlashHandler.initCommands();
+async function initEvents() {
   EventHandler.initEvents();
+  await SlashHandler.initCommands();
 
   client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand() || !interaction.inGuild()) return;
 
     await SlashHandler.processCommand(interaction);
+  });
+}
+
+function initRPC() {
+
+  client.user?.setPresence({
+    activities: [
+      {
+        name: process.env.CLAN_NAME!,
+        type: ActivityType.Competing,
+      }
+    ],
+    status: "dnd"
   });
 }
 
