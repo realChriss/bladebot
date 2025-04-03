@@ -1,9 +1,12 @@
+import { getBuildVersion } from "./utils/buildInfo";
 import Logger from "./utils/Logger";
 
 function initEnv() {
   process.env.STATE ??= "dev";
+
+  const buildVersion = getBuildVersion();
   Logger.info(
-    `Running in ${process.env.STATE === "prod" ? "production" : "development"} mode`,
+    `Running in ${process.env.STATE === "prod" ? "production" : "development"} mode ${buildVersion ? `at \`${buildVersion.branch} / ${buildVersion.commit}\`` : ""}`,
   );
 }
 
