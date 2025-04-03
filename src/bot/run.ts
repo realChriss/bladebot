@@ -32,15 +32,14 @@ async function initEvents() {
 }
 
 function initRPC() {
-
   client.user?.setPresence({
     activities: [
       {
         name: process.env.CLAN_NAME!,
         type: ActivityType.Competing,
-      }
+      },
     ],
-    status: "dnd"
+    status: "dnd",
   });
 }
 
