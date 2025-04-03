@@ -41,12 +41,18 @@ const event: ClientEvent = {
       return;
     }
 
+    await appliedMember.roles.remove([
+      process.env.WAITLIST_ROLE!,
+      process.env.TRYOUT_PENDING_ROLE!,
+    ]);
+
     const embedContent: TMessageReplyPayload = {
       authorName: process.env.CLAN_NAME,
       title: "You have been rejected",
       description: `You have been rejected from joining **${process.env.CLAN_NAME}**`,
       footerText: "Create a ticket for more information",
     };
+
     const dmEmbed = new MessageSender(null, embedContent, {
       state: EMessageReplyState.error,
     }).getEmbed();

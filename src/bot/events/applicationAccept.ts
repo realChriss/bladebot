@@ -153,8 +153,15 @@ const event: ClientEvent = {
       Logger.error("Main chat not found");
     }
 
-    await appliedMember.roles.add(process.env.CLAN_ROLE!);
-    await appliedMember.roles.remove(process.env.WAITLIST_ROLE!);
+    await appliedMember.roles.add([
+      process.env.CLAN_ROLE!,
+      process.env.VERIFIED_ROLE!,
+    ]);
+    await appliedMember.roles.remove([
+      process.env.UNVERIFIED_ROLE!,
+      process.env.WAITLIST_ROLE!,
+      process.env.TRYOUT_PENDING_ROLE!,
+    ]);
 
     const embedContent: TMessageReplyPayload = {
       authorName: process.env.CLAN_NAME,
@@ -162,6 +169,7 @@ const event: ClientEvent = {
       description: `You are now a part of **${process.env.CLAN_NAME}**`,
       footerText: "You will be added to the Bladeball clan shortly",
     };
+
     const dmEmbed = new MessageSender(null, embedContent, {
       state: EMessageReplyState.success,
     }).getEmbed();
