@@ -49,17 +49,17 @@ const components = [
 const bloodlustComponents = [
   {
     type: 2,
-    label: "Verify and Waitlist",
-    style: 2,
-    custom_id: "application_verify_and_waitlist",
-  },
-  {
-    type: 2,
     label: "Demand Tryout",
     style: 2,
     custom_id: "application_demand_tryout",
   },
-]
+  {
+    type: 2,
+    label: "Verify and Waitlist",
+    style: 2,
+    custom_id: "application_verify_and_waitlist",
+  },
+];
 
 function isValidInteger(value: string): boolean {
   return /^\d+$/.test(value);

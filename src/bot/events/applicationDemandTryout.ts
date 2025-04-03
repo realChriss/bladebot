@@ -1,5 +1,9 @@
 import ClientEvent from "../classes/ClientEvent";
-import { Events, Interaction, EmbedBuilder, TextChannel, SendableChannels } from "discord.js";
+import {
+  Events,
+  Interaction,
+  EmbedBuilder,
+} from "discord.js";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import {
   getAppliedMember,
@@ -62,9 +66,9 @@ const event: ClientEvent = {
           description: `❌ **${appliedMember.user.username}** is already in the tryout queue.`,
           footerText: interaction.user.username,
         },
-        { state: EMessageReplyState.error }
+        { state: EMessageReplyState.error },
       ).getEmbed();
-      
+
       await interaction.editReply({
         embeds: [alreadyInQueueEmbed],
       });
@@ -72,7 +76,7 @@ const event: ClientEvent = {
     }
 
     let userRegion = null;
-    
+
     for (const regionRoleId in regions) {
       if (appliedMember.roles.cache.has(regionRoleId)) {
         userRegion = regions[regionRoleId];
@@ -87,9 +91,9 @@ const event: ClientEvent = {
           description: `Could not determine ${appliedMember.user.username}'s region. Please make sure they have a region role.`,
           footerText: interaction.user.username,
         },
-        { state: EMessageReplyState.error }
+        { state: EMessageReplyState.error },
       ).getEmbed();
-      
+
       await interaction.editReply({
         embeds: [errorEmbed],
       });
@@ -97,7 +101,7 @@ const event: ClientEvent = {
     }
 
     const tryoutChannel = interaction.client.channels.cache.get(
-      process.env.TRYOUT_CHANNEL!
+      process.env.TRYOUT_CHANNEL!,
     );
 
     if (!tryoutChannel || !tryoutChannel.isSendable()) {
@@ -107,9 +111,9 @@ const event: ClientEvent = {
           description: `Could not find the tryout channel.`,
           footerText: interaction.user.username,
         },
-        { state: EMessageReplyState.error }
+        { state: EMessageReplyState.error },
       ).getEmbed();
-      
+
       await interaction.editReply({
         embeds: [errorEmbed],
       });
@@ -123,10 +127,16 @@ const event: ClientEvent = {
         iconURL: appliedMember.displayAvatarURL(),
       })
       .setTitle("Tryout Request")
-      .setDescription(`**${appliedMember.user.username}** needs to be tried out.\n\n**Tryout Information:**\n• 1v1 against a tryouter\n• Long distance\n• Best of 5\n• No abilities (equip pulse <:Pulse:1357283254100688947>)\n\nThe purpose of this tryout is to assess your skill level and gameplay understanding. Winning is not required.`)
+      .setDescription(
+        `**${appliedMember.user.username}** needs to be tried out.\n\n**Tryout Information:**\n• 1v1 against a tryouter\n• Long distance\n• Best of 5\n• No abilities (equip pulse <:Pulse:1357283254100688947>)\n\nThe purpose of this tryout is to assess your skill level and gameplay understanding. Winning is not required.`,
+      )
       .addFields(
         { name: "Region", value: userRegion.name, inline: true },
-        { name: "Requested by", value: interaction.user.displayName, inline: true }
+        {
+          name: "Requested by",
+          value: interaction.user.displayName,
+          inline: true,
+        },
       )
       .setThumbnail(application.roblox_headshot_url)
       .setTimestamp();
@@ -146,7 +156,7 @@ const event: ClientEvent = {
         description: `⚔️ Added **${appliedMember.user.username}** to tryout queue.\nRegion: **${userRegion.name}**`,
         footerText: interaction.user.username,
       },
-      { state: EMessageReplyState.success }
+      { state: EMessageReplyState.success },
     ).getEmbed();
 
     await interaction.editReply({
