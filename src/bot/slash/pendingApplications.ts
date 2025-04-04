@@ -65,10 +65,10 @@ async function getApplicationsListString(
 
 function buildEmbedDescription(applicationCount: number, listString: string) {
   if (applicationCount > 0) {
-    return `There ${applicationCount !== 1 ? "are" : "is"} ${applicationCount} pending invites\n\n**Pending Invites**\n${listString}`;
+    return `There ${applicationCount !== 1 ? "are" : "is"} ${applicationCount} pending applications\n\n**Pending Applications**\n${listString}`;
   }
 
-  return `There are no pending invites`;
+  return `There are no pending applications`;
 }
 
 const command: ClientSlash = {
