@@ -60,6 +60,11 @@ const event: ClientEvent = {
       Logger.warn(error);
     });
 
+    await appliedMember.roles.remove([
+      process.env.TRYOUT_PENDING_ROLE!,
+      process.env.WAITLIST_ROLE!,
+    ])
+
     const embed = new MessageSender(
       null,
       {
