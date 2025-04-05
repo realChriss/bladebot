@@ -32,7 +32,10 @@ const event: ClientEvent = {
       process.env.WAITLIST_ROLE!,
       process.env.VERIFIED_ROLE!,
     ]);
-    await appliedMember.roles.remove(process.env.UNVERIFIED_ROLE!);
+    await appliedMember.roles.remove([
+      process.env.UNVERIFIED_ROLE!,
+      process.env.TRYOUT_PENDING_ROLE!
+    ]);
 
     const embed = new MessageSender(
       null,
