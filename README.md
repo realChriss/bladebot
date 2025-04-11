@@ -55,7 +55,7 @@ Allows administrators to configure bot settings through the `/settings` command,
 
 Run the following in your terminal:
 
-```
+```bash
 git clone <repository-url>
 ```
 
@@ -63,7 +63,7 @@ git clone <repository-url>
 
 Install the required packages using npm:
 
-```
+```bash
 npm install
 ```
 
@@ -84,29 +84,35 @@ npm install
 
 To generate the Prisma schema, run:
 
-```
-npx prisma generate
-```
+  ```bash
+  npx prisma generate
+  ```
 
-6. **Docker Deployment**
+6. **Emojis**
+
+- Upload the emojis from `assets/` folder to your Discord bot via the Discord dashboard (https://discord.com/developers/applications/:appId/emojis)
+- Copy the emoji Markdown (`<:Name:ID>`)
+- Update the emoji strings in [emoji.ts](src/bot/assets/emoji.ts) with your new emoji
+
+7. **Docker Deployment**
 
 To deploy with Docker, use the provided shell scripts:
 
 - Start the containers:
 
-  ```
+  ```bash
   sh up.sh
   ```
 
 - To restart the bot:
 
-  ```
+  ```bash
   sh restart.sh
   ```
 
 - To stop the containers:
 
-  ```
+  ```bash
   sh down.sh
   ```
 
@@ -117,14 +123,14 @@ To deploy with Docker, use the provided shell scripts:
 - **Linting & Formatting:**  
   Uses Prettier for code formatting. You can format the code by running:
 
-  ```
+  ```bash
   npm run pretty
   ```
 
 - **Testing:**  
   Run TypeScript type checks using:
 
-  ```
+  ```bash
   npm run test
   ```
 

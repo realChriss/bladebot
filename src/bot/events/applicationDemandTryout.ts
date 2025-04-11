@@ -5,6 +5,7 @@ import {
   getAppliedMember,
   getApplication,
 } from "../../utils/applicationActionUtils";
+import Emoji from "../assets/emoji";
 
 type Regions = Record<string, { name: string; tryouterRoleId: string }>;
 
@@ -124,7 +125,7 @@ const event: ClientEvent = {
       })
       .setTitle("Tryout Request")
       .setDescription(
-        `**${appliedMember.user.username}** needs to be tried out.\n\n**Tryout Information:**\n• 1v1 against a tryouter\n• Long distance\n• Best of 5\n• No abilities (equip pulse <:Pulse:1357283254100688947>)\n\nThe purpose of this tryout is to assess your skill level and gameplay understanding. Winning is not required.`,
+        `**${appliedMember.user.username}** needs to be tried out.\n\n**Tryout Information:**\n• 1v1 against a tryouter\n• Long distance\n• Best of 5\n• No abilities (equip pulse ${Emoji.pulse})\n\nThe purpose of this tryout is to assess your skill level and gameplay understanding. Winning is not required.`,
       )
       .addFields(
         { name: "Region", value: userRegion.name, inline: true },
