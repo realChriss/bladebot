@@ -8,6 +8,7 @@ import {
 import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import { application } from "@prisma/client";
+import Emoji from "../assets/emoji";
 
 async function fetchApplicationMessage(
   msgId: string,
@@ -58,14 +59,14 @@ async function getApplicationsListString(
     .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
     .map(
       (data) =>
-        `${data.username} — ${data.timestamp} — ${data.url} ${data.waitlisted ? "— (waitlist)" : ""}`,
+        `${data.username} — ${data.timestamp} — ${data.url} ${data.waitlisted ? Emoji.waitlist : ""}`,
     )
     .join("\n");
 }
 
 function buildEmbedDescription(applicationCount: number, listString: string) {
   if (applicationCount > 0) {
-    return `There ${applicationCount !== 1 ? "are" : "is"} ${applicationCount} pending applications\n\n**Pending Applications**\n${listString}`;
+    return `There ${applicationCount !== 1 ? "are" : "is"} ${applicationCount} pending applications\n\n**Pending Applications**\n${listString}\n\n*<:waitlist:1360251417423777824> = Waitlisted user*`;
   }
 
   return `There are no pending applications`;
