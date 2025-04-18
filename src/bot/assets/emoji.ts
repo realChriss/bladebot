@@ -1,5 +1,5 @@
 const Emoji: Record<string, string> = {
-  pulse: "<:Pulse:1357283254100688947>",
+  pulse: "<:pulse:1357283254100688947>",
   waitlist: "<:waitlist:1360251417423777824>",
 }
 
