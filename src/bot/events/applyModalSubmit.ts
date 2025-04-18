@@ -231,9 +231,9 @@ async function getDescription(): Promise<string> {
   if (await ConfigManager.isAppOpen()) {
     text +=
       "**What's next?**\n" +
-      "• Your application will be reviewed by our staff team\n" +
-      "• You'll receive a response via DM from this bot\n\n" +
-      "Please ensure you have DMs enabled for this server";
+      "• Watch for pings in this server or DMs from this bot\n" +
+      "• Wait for further instructions\n\n" +
+      "Please make sure your DMs are enabled for this server.";
   } else {
     text +=
       "Applications are currently closed.\n" +

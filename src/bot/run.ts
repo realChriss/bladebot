@@ -37,7 +37,7 @@ function initRPC() {
       {
         name: process.env.CLAN_NAME!,
         type: ActivityType.Competing,
-        state: "Made by @realchriss"
+        state: "Made by @realchriss",
       },
     ],
     status: "dnd",

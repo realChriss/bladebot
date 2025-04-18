@@ -84,9 +84,9 @@ npm install
 
 To generate the Prisma schema, run:
 
-  ```bash
-  npx prisma generate
-  ```
+```bash
+npx prisma generate
+```
 
 6. **Emojis**
 
