@@ -54,3 +54,21 @@ model config {
   app_open        Boolean?
   send_wlc_msg    Boolean?
 }
+
+model application_stats {
+  id                Int       @id @default(autoincrement())
+  application_id    String    // Reference to original application msg_id
+  user_id           String    @db.VarChar
+  status            String    @db.VarChar // 'accepted', 'rejected', 'cancelled'
+  age               Int?
+  kill_count        Int?
+  win_count         Int?
+  processed_by      String?   @db.VarChar // Staff member who processed the application
+  created_at        DateTime  @default(now()) @db.Timestamp
+  processed_at      DateTime? @db.Timestamp
+  processing_time   Int?      // Time in minutes between creation and processing
+
+  @@index([status], name: "idx_app_status")
+  @@index([created_at], name: "idx_created_at")
+  @@map("application_stats")
+}
