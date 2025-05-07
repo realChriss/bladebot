@@ -71,7 +71,7 @@ async function drawBarChart(ctx: any, config: ChartConfiguration) {
 
   // Draw labels
   ctx.fillStyle = '#000000';
-  ctx.font = '12px Arial';
+  ctx.font = '20px Arial';
   labels.forEach((label, i) => {
     ctx.fillText(
       label, 
