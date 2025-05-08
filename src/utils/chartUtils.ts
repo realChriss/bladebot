@@ -111,7 +111,7 @@ export function calculateAgeDistribution(ages: number[]): Record<string, number>
   return distribution;
 }
 
-export function calculateProcessingTimeStats(times: number[]): {
+export function calculateTimeStats(times: number[]): {
   average: number;
   median: number;
   min: number;
