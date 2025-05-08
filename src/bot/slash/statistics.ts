@@ -166,7 +166,7 @@ Processing Time:
 
     await interaction.editReply({
       embeds: [statsEmbed, ageEmbed],
-      files: [statusAttachment, ageAttachment],
+      files: [ageAttachment],
     });
   },
 
