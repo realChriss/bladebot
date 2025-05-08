@@ -87,7 +87,7 @@ const event: ClientEvent = {
       0xa0a0a0,
     );
 
-    await logApplicationAction(interaction, application, 'deleted');
+    await logApplicationAction(interaction, application, "deleted");
   },
 };
 

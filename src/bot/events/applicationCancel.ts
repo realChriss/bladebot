@@ -104,7 +104,7 @@ const event: ClientEvent = {
       Logger.error("Application channel not found");
     }
 
-    await logApplicationAction(interaction, application, 'cancelled');
+    await logApplicationAction(interaction, application, "cancelled");
 
     Logger.info(`Application self cancelled by ${interaction.user.username}`);
   },

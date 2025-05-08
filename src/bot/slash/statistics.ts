@@ -2,46 +2,46 @@ import {
   AttachmentBuilder,
   ChatInputCommandInteraction,
   Client,
-  SlashCommandBuilder
-} from 'discord.js';
-import ClientSlash from '../classes/ClientSlash';
-import prisma from '../../db/prisma';
-import MessageSender, { EMessageReplyState } from '../classes/MessageSender';
+  SlashCommandBuilder,
+} from "discord.js";
+import ClientSlash from "../classes/ClientSlash";
+import prisma from "../../db/prisma";
+import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import {
   calculateAgeDistribution,
   calculateTimeStats,
   createTimeRanges,
-  generateChart
-} from '../../utils/chartUtils';
-import { formatDuration } from '../../utils/applicationStatsUtils';
+  generateChart,
+} from "../../utils/chartUtils";
+import { formatDuration } from "../../utils/applicationStatsUtils";
 
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
-    .setName('statistics')
-    .setDescription('Show application statistics')
-    .addIntegerOption(option =>
+    .setName("statistics")
+    .setDescription("Show application statistics")
+    .addIntegerOption((option) =>
       option
-        .setName('days')
-        .setDescription('Number of days to show statistics for (default: 30)')
-        .setRequired(false)
+        .setName("days")
+        .setDescription("Number of days to show statistics for (default: 30)")
+        .setRequired(false),
     ) as SlashCommandBuilder,
 
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
-    const days = interaction.options.getInteger('days') || 30;
+    const days = interaction.options.getInteger("days") || 30;
     const { start, end } = createTimeRanges(days);
 
     const stats = await prisma.application_stats.findMany({
       where: {
-        created_at: { gte: start, lte: end }
-      }
+        created_at: { gte: start, lte: end },
+      },
     });
 
     if (stats.length === 0) {
       const noStats = new MessageSender(
         null,
         { description: `No application statistics for the last ${days} days.` },
-        { state: EMessageReplyState.error }
+        { state: EMessageReplyState.error },
       ).getEmbed();
       await interaction.editReply({ embeds: [noStats] });
       return;
@@ -49,19 +49,16 @@ const command: ClientSlash = {
 
     // Totals by status
     const totalApplications = stats.length;
-    const accepted = stats.filter(s => s.status === 'accepted').length;
-    const rejected = stats.filter(s => s.status === 'rejected').length;
-    const cancelled = stats.filter(s => s.status === 'cancelled').length;
-    const deleted = stats.filter(s => s.status === 'deleted').length;
+    const accepted = stats.filter((s) => s.status === "accepted").length;
+    const rejected = stats.filter((s) => s.status === "rejected").length;
+    const cancelled = stats.filter((s) => s.status === "cancelled").length;
+    const deleted = stats.filter((s) => s.status === "deleted").length;
 
     // Percentages
-    const pct = (n: number) =>
-      ((n / totalApplications) * 100).toFixed(0);
+    const pct = (n: number) => ((n / totalApplications) * 100).toFixed(0);
 
     // Ages
-    const ageValues = stats
-      .filter(s => s.age != null)
-      .map(s => s.age!);
+    const ageValues = stats.filter((s) => s.age != null).map((s) => s.age!);
     const averageAge =
       ageValues.length > 0
         ? ageValues.reduce((a, b) => a + b, 0) / ageValues.length
@@ -71,8 +68,8 @@ const command: ClientSlash = {
 
     // Kills
     const killValues = stats
-      .filter(s => s.kill_count != null)
-      .map(s => s.kill_count!);
+      .filter((s) => s.kill_count != null)
+      .map((s) => s.kill_count!);
     const averageKills =
       killValues.length > 0
         ? killValues.reduce((a, b) => a + b, 0) / killValues.length
@@ -81,8 +78,8 @@ const command: ClientSlash = {
 
     // Wins
     const winValues = stats
-      .filter(s => s.win_count != null)
-      .map(s => s.win_count!);
+      .filter((s) => s.win_count != null)
+      .map((s) => s.win_count!);
     const averageWins =
       winValues.length > 0
         ? winValues.reduce((a, b) => a + b, 0) / winValues.length
@@ -91,8 +88,8 @@ const command: ClientSlash = {
 
     // Processing times (ms)
     const procTimes = stats
-      .filter(s => s.processing_time != null)
-      .map(s => s.processing_time!);
+      .filter((s) => s.processing_time != null)
+      .map((s) => s.processing_time!);
     const { average, median, min, max } = calculateTimeStats(procTimes);
     const formattedAverage = formatDuration(average);
     const formattedMedian = formatDuration(median);
@@ -101,36 +98,36 @@ const command: ClientSlash = {
 
     // Charts
     const statusChart = await generateChart({
-      type: 'pie',
+      type: "pie",
       data: {
-        labels: ['Accepted', 'Rejected', 'Cancelled', 'Deleted'],
+        labels: ["Accepted", "Rejected", "Cancelled", "Deleted"],
         datasets: [
           {
             data: [accepted, rejected, cancelled, deleted],
-            backgroundColor: ['#00ff00', '#ff0000', '#ffff00', '#a0a0a0']
-          }
-        ]
-      }
+            backgroundColor: ["#00ff00", "#ff0000", "#ffff00", "#a0a0a0"],
+          },
+        ],
+      },
     });
     const ageChart = await generateChart({
-      type: 'bar',
+      type: "bar",
       data: {
         labels: Object.keys(ageDistribution),
         datasets: [
           {
-            label: 'Age Distribution',
+            label: "Age Distribution",
             data: Object.values(ageDistribution),
-            backgroundColor: '#3498db'
-          }
-        ]
-      }
+            backgroundColor: "#3498db",
+          },
+        ],
+      },
     });
 
     const statusAttachment = new AttachmentBuilder(statusChart, {
-      name: 'status.png'
+      name: "status.png",
     });
     const ageAttachment = new AttachmentBuilder(ageChart, {
-      name: 'age.png'
+      name: "age.png",
     });
 
     const statsEmbed = new MessageSender(
@@ -155,21 +152,21 @@ Processing Time:
 • Max: **${formattedMax}**
         `,
       },
-      { state: EMessageReplyState.success }
+      { state: EMessageReplyState.success },
     ).getEmbed();
 
     const ageEmbed = new MessageSender(
       null,
       {
-        title: 'Age Distribution',
-        image: 'attachment://age.png'
+        title: "Age Distribution",
+        image: "attachment://age.png",
       },
-      { state: EMessageReplyState.success }
+      { state: EMessageReplyState.success },
     ).getEmbed();
 
     await interaction.editReply({
       embeds: [statsEmbed, ageEmbed],
-      files: [statusAttachment, ageAttachment]
+      files: [statusAttachment, ageAttachment],
     });
   },
 
@@ -177,8 +174,8 @@ Processing Time:
     isDisabled: false,
     onlyBotChannel: false,
     allowStaff: true,
-    allowEveryone: true
-  }
+    allowEveryone: true,
+  },
 };
 
 export default command;

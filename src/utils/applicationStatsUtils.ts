@@ -2,12 +2,12 @@ import { ButtonInteraction } from "discord.js";
 import { application } from "@prisma/client";
 import prisma from "../db/prisma";
 
-type ApplicationStatus = 'accepted' | 'rejected' | 'cancelled' | 'deleted';
+type ApplicationStatus = "accepted" | "rejected" | "cancelled" | "deleted";
 
 export async function logApplicationAction(
   interaction: ButtonInteraction,
   application: application,
-  status: ApplicationStatus
+  status: ApplicationStatus,
 ): Promise<void> {
   await prisma.application_stats.create({
     data: {
@@ -19,8 +19,10 @@ export async function logApplicationAction(
       win_count: application.win,
       processed_by: interaction.member?.user.id,
       processed_at: new Date(),
-      processing_time: Math.floor(Date.now() - application.created_at.getTime())
-    }
+      processing_time: Math.floor(
+        Date.now() - application.created_at.getTime(),
+      ),
+    },
   });
 }
 
@@ -36,5 +38,5 @@ export function formatDuration(ms: number): string {
   if (minutes) parts.push(`${minutes}m`);
 
   if (seconds || parts.length === 0) parts.push(`${seconds}s`);
-  return parts.join(' ');
+  return parts.join(" ");
 }

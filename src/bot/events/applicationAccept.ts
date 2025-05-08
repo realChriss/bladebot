@@ -213,7 +213,7 @@ const event: ClientEvent = {
     await updateNickname(interaction, appliedMember, application);
     await sendWelcomeMessage(interaction, appliedMember, application);
 
-    await logApplicationAction(interaction, application, 'accepted');
+    await logApplicationAction(interaction, application, "accepted");
   },
 };
 
