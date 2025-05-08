@@ -44,4 +44,5 @@ const command: ClientSlash = {
     cooldown: 5,
   },
 };
+
 export default command;

@@ -14,17 +14,21 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.70",
     "@prisma/client": "^5.22.0",
     "axios": "^1.7.7",
+    "chart.js": "^4.4.9",
+    "chartjs-node-canvas": "^5.0.0",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.5",
     "easy-table": "^1.2.0",
     "moment-timezone": "^0.5.46",
     "pg": "^8.13.3",
     "prettier": "^3.5.0",
-    "prisma": "^6.4.0"
+    "prisma": "^5.22.0"
   },
   "devDependencies": {
+    "@types/chart.js": "^2.9.41",
     "@types/node": "^22.8.6",
     "esbuild": "^0.25.0",
     "typescript": "^5.6.3"

@@ -3,6 +3,7 @@ import { Events, Interaction } from "discord.js";
 import prisma from "../../db/prisma";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
+import { logApplicationAction } from "../../utils/applicationStatsUtils";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -102,6 +103,8 @@ const event: ClientEvent = {
     } else {
       Logger.error("Application channel not found");
     }
+
+    await logApplicationAction(interaction, application, 'cancelled');
 
     Logger.info(`Application self cancelled by ${interaction.user.username}`);
   },

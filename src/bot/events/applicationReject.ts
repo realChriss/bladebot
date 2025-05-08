@@ -9,6 +9,7 @@ import {
   getAppliedMember,
   getApplication,
 } from "../../utils/applicationActionUtils";
+import { logApplicationAction } from "../../utils/applicationStatsUtils";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -85,6 +86,8 @@ const event: ClientEvent = {
       `Rejected by ${interaction.member?.user.username}`,
       0xff0000,
     );
+
+    await logApplicationAction(interaction, application, 'rejected');
   },
 };
 

@@ -9,6 +9,7 @@ import {
   getAppliedMember,
   getApplication,
 } from "../../utils/applicationActionUtils";
+import { logApplicationAction } from "../../utils/applicationStatsUtils";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -85,6 +86,8 @@ const event: ClientEvent = {
       `Deleted by ${interaction.member?.user.username}`,
       0xa0a0a0,
     );
+
+    await logApplicationAction(interaction, application, 'deleted');
   },
 };
 

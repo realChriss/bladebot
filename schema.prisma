@@ -18,6 +18,7 @@ model application {
   age                     Int?
   kill                    Int?
   win                     Int?
+  created_at              DateTime     @default(now()) @db.Timestamp
 
   @@id([user_id, msg_id])
   @@map("application")
@@ -53,4 +54,22 @@ model config {
   id              Int @id
   app_open        Boolean?
   send_wlc_msg    Boolean?
+}
+
+model application_stats {
+  id                Int       @id @default(autoincrement())
+  application_id    String
+  user_id           String    @db.VarChar
+  status            String    @db.VarChar
+  age               Int?
+  kill_count        Int?
+  win_count         Int?
+  processed_by      String?   @db.VarChar
+  created_at        DateTime  @default(now()) @db.Timestamp
+  processed_at      DateTime? @db.Timestamp
+  processing_time   Int?
+
+  @@index([status], name: "idx_app_status")
+  @@index([created_at], name: "idx_created_at")
+  @@map("application_stats")
 }

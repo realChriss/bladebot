@@ -17,6 +17,7 @@ import {
   getApplication,
 } from "../../utils/applicationActionUtils";
 import { application } from "@prisma/client";
+import { logApplicationAction } from "../../utils/applicationStatsUtils";
 
 async function sendPendingInvite(
   interaction: ButtonInteraction,
@@ -211,6 +212,8 @@ const event: ClientEvent = {
     await sendPendingInvite(interaction, application, appliedMember);
     await updateNickname(interaction, appliedMember, application);
     await sendWelcomeMessage(interaction, appliedMember, application);
+
+    await logApplicationAction(interaction, application, 'accepted');
   },
 };
 
