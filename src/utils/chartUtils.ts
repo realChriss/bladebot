@@ -5,13 +5,10 @@ import { createCanvas as createJSCanvas } from 'canvas';
 const width = 800;
 const height = 400;
 
-// Since chartjs-node-canvas has type issues, we'll implement our own basic chart rendering
 export async function generateChart(config: ChartConfiguration): Promise<Buffer> {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
   
-  // For now, we'll create a simple visualization
-  // In production, you might want to use a more robust charting library
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, height);
 

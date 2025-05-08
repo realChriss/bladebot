@@ -1,14 +1,8 @@
-import { ApplicationCommandOptionType, AttachmentBuilder, ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
+import { AttachmentBuilder, ChatInputCommandInteraction, Client, SlashCommandBuilder } from 'discord.js';
 import ClientSlash from '../classes/ClientSlash';
 import prisma from '../../db/prisma';
 import MessageSender, { EMessageReplyState } from '../classes/MessageSender';
 import { calculateAgeDistribution, calculateProcessingTimeStats, createTimeRanges, generateChart } from '../../utils/chartUtils';
-
-interface ApplicationStats {
-  status: string;
-  age: number | null;
-  processing_time: number | null;
-}
 
 const slashData = new SlashCommandBuilder()
   .setName('statistics')
