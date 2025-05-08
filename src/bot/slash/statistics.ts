@@ -154,7 +154,6 @@ Processing Time:
 • Min: **${formattedMin}**
 • Max: **${formattedMax}**
         `,
-        image: 'attachment://status.png',
       },
       { state: EMessageReplyState.success }
     ).getEmbed();
