@@ -98,7 +98,7 @@ export function calculateAgeDistribution(ages: number[]): Record<string, number>
   };
 
   ages.forEach(age => {
-    if (age < 14) distribution['-14']++;
+    if (age < 14) distribution['< 14']++;
     else if (age == 14) distribution['14']++;
     else if (age == 15) distribution['15']++;
     else if (age == 16) distribution['16']++;
