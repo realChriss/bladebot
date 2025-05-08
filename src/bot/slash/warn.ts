@@ -48,6 +48,32 @@ const warnTypeData: Record<
   },
 };
 
+function buildWarnField(
+  warn: user_warn,
+  interaction: ChatInputCommandInteraction,
+): { name: string; value: string; inline: boolean } {
+  const createdAtTimestamp = Math.floor(
+    new Date(warn.created_at).getTime() / 1000,
+  );
+  const issuer = interaction.guild?.members.cache.get(warn.issuer_id);
+  const issuerName = issuer?.user.username || "Unknown";
+
+  const data = warnTypeData[warn.warn_type_id] || warnTypeData[1];
+
+  return {
+    name: `__${data.label} Warn #${warn.id}__`,
+    value: [
+      `**Warn Type:** ${data.label}`,
+      `**${data.requirementLabel}:** ${warn.requirement}`,
+      `**${data.earnedLabel}:** ${warn.earned}`,
+      `**${data.diffLabel}:** ${warn.diff !== null ? warn.diff : "N/A"}`,
+      `**Issuer:** ${issuerName}`,
+      `**Created At:** <t:${createdAtTimestamp}:f>`,
+    ].join("\n"),
+    inline: true,
+  };
+}
+
 async function createAndNotifyWarn(
   interaction: ChatInputCommandInteraction,
   config: WarnConfig,
@@ -145,7 +171,54 @@ async function donationWarnExec(interaction: ChatInputCommandInteraction) {
 }
 
 async function showWarnExec(interaction: ChatInputCommandInteraction) {
+  const warnId = interaction.options.getInteger("warn-id");
+
+  if (warnId) {
+    const warn = await prisma.user_warn.findUnique({
+      where: {
+        id: warnId,
+      },
+    });
+
+    if (!warn) {
+      await interaction.reply({
+        content: `Warn #${warnId} not found`,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const field = buildWarnField(warn, interaction);
+
+    const member = interaction.guild?.members.cache.get(warn.user_id);
+
+    const memberInfo = {
+      avatar: member?.displayAvatarURL() || undefined,
+      displayName: member?.displayName || undefined
+    }
+
+    const embed = new MessageSender(
+      null,
+      {
+        authorImg: memberInfo.avatar,
+        authorName: memberInfo.displayName,
+        title: `Warn #${warnId} ${member ? `for ${memberInfo.displayName}` : ""}`,
+        fields: [field],
+        footerText: interaction.member?.user.username,
+        color: 0xffffff,
+      },
+      { state: EMessageReplyState.none },
+    );
+
+    await interaction.reply({
+      embeds: [embed.getEmbed()],
+    });
+
+    return;
+  }
+
   const member = await resolveTargetMember(interaction);
+
   if (!member) {
     await interaction.reply({
       content: "Member not found",
@@ -163,32 +236,7 @@ async function showWarnExec(interaction: ChatInputCommandInteraction) {
   const apWarnCount = warns.filter((w) => w.warn_type_id === 1).length;
   const donationWarnCount = warns.filter((w) => w.warn_type_id === 2).length;
 
-  const buildWarnField = (
-    warn: user_warn,
-  ): { name: string; value: string; inline: boolean } => {
-    const createdAtTimestamp = Math.floor(
-      new Date(warn.created_at).getTime() / 1000,
-    );
-    const issuer = interaction.guild?.members.cache.get(warn.issuer_id);
-    const issuerName = issuer?.user.username || "Unknown";
-
-    const data = warnTypeData[warn.warn_type_id] || warnTypeData[1];
-
-    return {
-      name: `__${data.label} Warn #${warn.id}__`,
-      value: [
-        `**Warn Type:** ${data.label}`,
-        `**${data.requirementLabel}:** ${warn.requirement}`,
-        `**${data.earnedLabel}:** ${warn.earned}`,
-        `**${data.diffLabel}:** ${warn.diff !== null ? warn.diff : "N/A"}`,
-        `**Issuer:** ${issuerName}`,
-        `**Created At:** <t:${createdAtTimestamp}:f>`,
-      ].join("\n"),
-      inline: true,
-    };
-  };
-
-  const fields = warns.map(buildWarnField);
+  const fields = warns.map((field) => buildWarnField(field, interaction));
 
   const description = [
     apWarnCount < 1
@@ -359,7 +407,13 @@ const command: ClientSlash = {
           option
             .setName("target")
             .setDescription("The member to lookup")
-            .setRequired(true),
+            .setRequired(false),
+        )
+        .addIntegerOption((option) =>
+          option
+            .setName("warn-id")
+            .setDescription("Show a specific warn by ID")
+            .setRequired(false),
         ),
     )
     .addSubcommand((subcommand) =>
