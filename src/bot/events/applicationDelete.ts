@@ -9,6 +9,7 @@ import {
   getAppliedMember,
   getApplication,
 } from "../../utils/applicationActionUtils";
+import { logApplicationAction } from "../../utils/applicationStatsUtils";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -26,25 +27,6 @@ const event: ClientEvent = {
     if (!application) {
       return;
     }
-
-    // Get the original message timestamp
-    const appMessage = await interaction.channel?.messages.fetch(application.msg_id);
-    const createdTimestamp = appMessage?.createdTimestamp || Date.now();
-
-    // Record application statistics
-    await prisma.application_stats.create({
-      data: {
-        application_id: application.msg_id,
-        user_id: application.user_id,
-        status: 'deleted',
-        age: application.age,
-        kill_count: application.kill,
-        win_count: application.win,
-        processed_by: interaction.member?.user.id,
-        processed_at: new Date(),
-        processing_time: Math.floor((Date.now() - createdTimestamp) / 60000)
-      }
-    });
 
     await prisma.application.delete({
       where: {
@@ -104,6 +86,8 @@ const event: ClientEvent = {
       `Deleted by ${interaction.member?.user.username}`,
       0xa0a0a0,
     );
+
+    await logApplicationAction(interaction, application, 'deleted');
   },
 };
 

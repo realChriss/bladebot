@@ -17,6 +17,7 @@ import {
   getApplication,
 } from "../../utils/applicationActionUtils";
 import { application } from "@prisma/client";
+import { logApplicationAction } from "../../utils/applicationStatsUtils";
 
 async function sendPendingInvite(
   interaction: ButtonInteraction,
@@ -141,25 +142,6 @@ const event: ClientEvent = {
       return;
     }
 
-    // Get the original message timestamp
-    const appMessage = await interaction.channel?.messages.fetch(application.msg_id);
-    const createdTimestamp = appMessage?.createdTimestamp || Date.now();
-
-    // Record application statistics
-    await prisma.application_stats.create({
-      data: {
-        application_id: application.msg_id,
-        user_id: application.user_id,
-        status: 'accepted',
-        age: application.age,
-        kill_count: application.kill,
-        win_count: application.win,
-        processed_by: interaction.member?.user.id,
-        processed_at: new Date(),
-        processing_time: Math.floor((Date.now() - createdTimestamp) / 60000)
-      }
-    });
-
     const appliedMember = await getAppliedMember(interaction, application);
     if (!appliedMember) {
       return;
@@ -230,6 +212,8 @@ const event: ClientEvent = {
     await sendPendingInvite(interaction, application, appliedMember);
     await updateNickname(interaction, appliedMember, application);
     await sendWelcomeMessage(interaction, appliedMember, application);
+
+    await logApplicationAction(interaction, application, 'accepted');
   },
 };
 
