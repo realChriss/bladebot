@@ -92,6 +92,11 @@ export default class EventHandler {
       const event: ClientEvent = require(
         path.join(__dirname, "events", file),
       ).default;
+
+      if (!event) {
+        Logger.error(`Event does not exist in file ${file}`)
+      }
+
       const funcsInEvent = this.events.get(event.name);
 
       if (funcsInEvent) {
