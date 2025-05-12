@@ -15,7 +15,9 @@ async function fetchApplicationMessage(
   msgId: string,
   interaction: ChatInputCommandInteraction,
 ): Promise<Message | null> {
-  const channel = interaction.guild?.channels.cache.get(env.APPLICATION_CHANNEL);
+  const channel = interaction.guild?.channels.cache.get(
+    env.APPLICATION_CHANNEL,
+  );
   if (!channel || !channel.isTextBased()) {
     return null;
   }

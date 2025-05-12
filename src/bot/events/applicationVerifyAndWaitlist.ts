@@ -29,10 +29,7 @@ const event: ClientEvent = {
       return;
     }
 
-    await appliedMember.roles.add([
-      env.WAITLIST_ROLE!,
-      env.VERIFIED_ROLE!,
-    ]);
+    await appliedMember.roles.add([env.WAITLIST_ROLE!, env.VERIFIED_ROLE!]);
     await appliedMember.roles.remove([
       env.UNVERIFIED_ROLE!,
       env.TRYOUT_PENDING_ROLE!,

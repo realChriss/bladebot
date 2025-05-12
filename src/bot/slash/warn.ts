@@ -195,8 +195,8 @@ async function showWarnExec(interaction: ChatInputCommandInteraction) {
 
     const memberInfo = {
       avatar: member?.displayAvatarURL() || undefined,
-      displayName: member?.displayName || undefined
-    }
+      displayName: member?.displayName || undefined,
+    };
 
     const embed = new MessageSender(
       null,

@@ -47,7 +47,11 @@ export default class Logger {
     return order.indexOf(level) >= order.indexOf(this.currentLevel);
   }
 
-  private static async sendWebhook(level: LogLevel, message: string, silent = false): Promise<boolean> {
+  private static async sendWebhook(
+    level: LogLevel,
+    message: string,
+    silent = false,
+  ): Promise<boolean> {
     if (env.STATE !== "prod") {
       return false;
     }
@@ -60,9 +64,7 @@ export default class Logger {
 
     const payload = {
       flags: silent ? 4096 : undefined,
-      embeds: [
-        { description: message, color: config.color },
-      ],
+      embeds: [{ description: message, color: config.color }],
     };
 
     try {
@@ -71,7 +73,9 @@ export default class Logger {
         timeout: 4000,
       });
       if (response.status === 204) return true;
-      console.error(`${SYMBOLS.ERROR} Webhook failed (${level}) with status ${response.status}`);
+      console.error(
+        `${SYMBOLS.ERROR} Webhook failed (${level}) with status ${response.status}`,
+      );
       return false;
     } catch (error) {
       console.error(`${SYMBOLS.ERROR} Webhook error:`, error);

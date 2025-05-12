@@ -25,7 +25,9 @@ async function sendPendingInvite(
   application: application,
   appliedMember: GuildMember,
 ) {
-  const invChannel = interaction.guild?.channels.cache.get(env.PENDING_INV_CHANNEL);
+  const invChannel = interaction.guild?.channels.cache.get(
+    env.PENDING_INV_CHANNEL,
+  );
   if (!invChannel || !invChannel.isSendable()) {
     Logger.error("Invite channel not found");
     return;
@@ -149,10 +151,7 @@ const event: ClientEvent = {
       Logger.error("Main chat not found");
     }
 
-    await appliedMember.roles.add([
-      env.CLAN_ROLE,
-      env.VERIFIED_ROLE!,
-    ]);
+    await appliedMember.roles.add([env.CLAN_ROLE, env.VERIFIED_ROLE!]);
     await appliedMember.roles.remove([
       env.UNVERIFIED_ROLE!,
       env.WAITLIST_ROLE!,

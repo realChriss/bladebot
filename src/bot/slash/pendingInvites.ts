@@ -15,7 +15,9 @@ async function fetchInviteMessage(
   msgId: string,
   interaction: ChatInputCommandInteraction,
 ): Promise<Message | null> {
-  const channel = interaction.guild?.channels.cache.get(env.PENDING_INV_CHANNEL);
+  const channel = interaction.guild?.channels.cache.get(
+    env.PENDING_INV_CHANNEL,
+  );
   if (!channel || !channel.isTextBased()) {
     Logger.error("Invite channel not found");
     return null;

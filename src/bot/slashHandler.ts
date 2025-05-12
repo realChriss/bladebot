@@ -167,9 +167,9 @@ export default class SlashHandler {
     return {
       isDisabled: isDisabled,
       isChriss: member.id === env.DEV_ID,
-      isDev: !!env.DEV_ROLE && Array.from(member.roles.cache.keys()).includes(
-        env.DEV_ROLE,
-      ),
+      isDev:
+        !!env.DEV_ROLE &&
+        Array.from(member.roles.cache.keys()).includes(env.DEV_ROLE),
       isAdmin: member.permissions.has(PermissionFlagsBits.Administrator),
       isEveryone: true,
       isBotChannel: channel.id === env.BOT_CHANNEL,
