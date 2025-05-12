@@ -1,106 +1,99 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { env } from "../env";
 
-type T_LOG_LEVEL = "INFO" | "WARN" | "ERROR";
+export type LogLevel = "INFO" | "WARN" | "ERROR";
 
-type T_SYMBOLS = {
-  INFO: "[+]";
-  WARN: "[!]";
-  ERROR: "[!!]";
+const SYMBOLS: Record<LogLevel, string> = {
+  INFO: "[+]",
+  WARN: "[!]",
+  ERROR: "[!!]",
 };
 
-type T_SYMBOL = "[+]" | "[!]" | "[!!]";
+interface WebhookConfig {
+  url: string;
+  color: number;
+}
 
-enum E_WEBHOOKS {
-  info,
-  warn,
-  error,
+const WEBHOOKS: Record<LogLevel, WebhookConfig> = {
+  INFO: {
+    url: env.INFO_WEBHOOK,
+    color: parseHexColor(env.INFO_COLOR),
+  },
+  WARN: {
+    url: env.WARN_WEBHOOK,
+    color: parseHexColor(env.WARN_COLOR),
+  },
+  ERROR: {
+    url: env.ERROR_WEBHOOK,
+    color: parseHexColor(env.ERROR_COLOR),
+  },
+};
+
+function parseHexColor(color: string): number {
+  const hex = color.replace(/^#/, "");
+  const parsed = parseInt(hex, 16);
+  return isNaN(parsed) ? 0 : parsed;
 }
 
 export default class Logger {
-  private static SYMBOLS: T_SYMBOLS = Object.freeze({
-    INFO: "[+]",
-    WARN: "[!]",
-    ERROR: "[!!]",
-  });
+  private static currentLevel: LogLevel = "INFO";
 
-  private static LOG_LEVEL: T_LOG_LEVEL | null = null;
-
-  private static log(message: string, symbol: T_SYMBOL) {
-    console.log(symbol, message);
+  public static setLevel(level: LogLevel): void {
+    this.currentLevel = level;
   }
 
-  private static async webhook(
-    logtype: E_WEBHOOKS,
-    message: string,
-    silent?: boolean,
-  ): Promise<boolean | null> {
+  private static shouldLog(level: LogLevel): boolean {
+    const order: LogLevel[] = ["INFO", "WARN", "ERROR"];
+    return order.indexOf(level) >= order.indexOf(this.currentLevel);
+  }
+
+  private static async sendWebhook(level: LogLevel, message: string, silent = false): Promise<boolean> {
     if (env.STATE !== "prod") {
-      return null;
+      return false;
     }
 
-    const sendRequest = async (
-      url: string,
-      color: number,
-    ): Promise<boolean> => {
-      const data = {
-        flags: silent ? 4096 : undefined,
-        embeds: [
-          {
-            description: message,
-            color: color,
-          },
-        ],
-      };
+    const config = WEBHOOKS[level];
+    if (!config.url) {
+      console.warn(`${SYMBOLS.WARN} Missing webhook URL for level ${level}`);
+      return false;
+    }
 
-      const res = await axios.post(url, data, {
+    const payload = {
+      flags: silent ? 4096 : undefined,
+      embeds: [
+        { description: message, color: config.color },
+      ],
+    };
+
+    try {
+      const response: AxiosResponse = await axios.post(config.url, payload, {
         validateStatus: () => true,
         timeout: 4000,
       });
-
-      if (res.status === 204) {
-        return true;
-      } else {
-        console.log("ERROR: webhook failed with status " + res.status);
-        return false;
-      }
-    };
-
-    switch (logtype) {
-      case E_WEBHOOKS.info:
-        return await sendRequest(
-          env.INFO_WEBHOOK,
-          parseInt(env.INFO_COLOR!),
-        );
-      case E_WEBHOOKS.warn:
-        return await sendRequest(
-          env.WARN_WEBHOOK,
-          parseInt(env.WARN_COLOR!),
-        );
-      case E_WEBHOOKS.error:
-        return await sendRequest(
-          env.ERROR_WEBHOOK,
-          parseInt(env.ERROR_COLOR!),
-        );
+      if (response.status === 204) return true;
+      console.error(`${SYMBOLS.ERROR} Webhook failed (${level}) with status ${response.status}`);
+      return false;
+    } catch (error) {
+      console.error(`${SYMBOLS.ERROR} Webhook error:`, error);
+      return false;
     }
   }
 
-  public static setLogLevel(loglevel: T_LOG_LEVEL) {
-    this.LOG_LEVEL = loglevel;
+  public static info(message: string, silent = false): void {
+    if (!this.shouldLog("INFO")) return;
+    console.log(SYMBOLS.INFO, message);
+    void this.sendWebhook("INFO", message, silent);
   }
 
-  public static info(message: string) {
-    this.log(message, this.SYMBOLS.INFO);
-    this.webhook(E_WEBHOOKS.info, message);
+  public static warn(message: string, silent = false): void {
+    if (!this.shouldLog("WARN")) return;
+    console.warn(SYMBOLS.WARN, message);
+    void this.sendWebhook("WARN", message, silent);
   }
 
-  public static warn(message: string) {
-    this.log(message, this.SYMBOLS.WARN);
-    this.webhook(E_WEBHOOKS.warn, message);
-  }
-
-  public static error(message: string) {
-    this.log(message, this.SYMBOLS.ERROR);
-    this.webhook(E_WEBHOOKS.error, message);
+  public static error(message: string, silent = false): void {
+    if (!this.shouldLog("ERROR")) return;
+    console.error(SYMBOLS.ERROR, message);
+    void this.sendWebhook("ERROR", message, silent);
   }
 }
