@@ -6,6 +6,7 @@ import ClientCommand from "./classes/ClientCommand";
 import client from "./client";
 import MessageSender, { EMessageReplyState } from "./classes/MessageSender";
 import { Channel, GuildMember, Message, PermissionFlagsBits } from "discord.js";
+import { env } from "../env";
 
 class CooldownManager {
   private static users = new Map<string, number>();
@@ -96,18 +97,18 @@ export default class CommandHandler {
 
     return {
       isDisabled: isDisabled,
-      isChriss: member.id === process.env.DEV_ID,
-      isDev: Array.from(member.roles.cache.keys()).includes(
-        process.env.DEV_ROLE!,
-      ),
+      isChriss: member.id === env.DEV_ID,
+      isDev:
+        !!env.DEV_ROLE &&
+        Array.from(member.roles.cache.keys()).includes(env.DEV_ROLE),
       isAdmin: member.permissions.has(PermissionFlagsBits.Administrator),
       isEveryone: true,
-      isBotChannel: channel.id === process.env.BOT_CHANNEL,
+      isBotChannel: channel.id === env.BOT_CHANNEL,
       isDisabledUser: disabledUsers.includes(member.id),
       isDisabledChannel: disabledChannels.includes(msg.channel.id),
       get isStaff() {
         return (
-          member.roles.cache.has(process.env.STAFF_ROLE!) ||
+          member.roles.cache.has(env.STAFF_ROLE) ||
           this.isChriss ||
           this.isDev ||
           this.isAdmin
@@ -145,7 +146,7 @@ export default class CommandHandler {
       this.reply(
         msg,
         {
-          description: `This command can only be executed in <#${process.env.BOT_CHANNEL}>`,
+          description: `This command can only be executed in <#${env.BOT_CHANNEL}>`,
           footerText: displayname,
         },
         {
