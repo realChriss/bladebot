@@ -7,8 +7,12 @@ const envSchema = z.object({
   INFO_WEBHOOK: z.string().url(),
   WARN_WEBHOOK: z.string().url(),
   ERROR_WEBHOOK: z.string().url(),
+  INFO_COLOR: z.string().default("ffffff"),
+  WARN_COLOR: z.string().default("16108333"),
+  ERROR_COLOR: z.string().default("16718619"),
   CLAN_NAME: z.string(),
   SERVER_ID: z.string(),
+  STATE: z.string().default("dev"),
 
   // Bot config
   PREFIX: z.string().default("!"),

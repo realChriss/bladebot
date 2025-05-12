@@ -2,6 +2,7 @@ import ClientEvent from "../classes/ClientEvent";
 import { Events, GuildMember, GuildTextBasedChannel } from "discord.js";
 import Logger from "../../utils/Logger";
 import prisma from "../../db/prisma";
+import { env } from "../../env";
 
 async function getApplication(userId: string) {
   const application = await prisma.application.findFirst({
@@ -31,7 +32,7 @@ const event: ClientEvent = {
     });
 
     const applicationChannel = member.guild.channels.cache.get(
-      process.env.APPLICATION_CHANNEL!,
+      env.APPLICATION_CHANNEL,
     ) as GuildTextBasedChannel | undefined;
     if (!applicationChannel) {
       Logger.error("Application channel not found");
@@ -39,7 +40,7 @@ const event: ClientEvent = {
     }
 
     const inviteChannel = member.guild.channels.cache.get(
-      process.env.PENDING_INV_CHANNEL!,
+      env.PENDING_INV_CHANNEL,
     ) as GuildTextBasedChannel | undefined;
     if (!inviteChannel) {
       Logger.error("Pending invite channel not found");

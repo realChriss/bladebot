@@ -10,6 +10,7 @@ import {
   getApplication,
 } from "../../utils/applicationActionUtils";
 import { logApplicationAction } from "../../utils/applicationStatsUtils";
+import { env } from "../../env";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -43,9 +44,9 @@ const event: ClientEvent = {
     }
 
     const embedContent: TMessageReplyPayload = {
-      authorName: process.env.CLAN_NAME,
+      authorName: env.CLAN_NAME,
       title: "Your application has been deleted",
-      description: `Your application at **${process.env.CLAN_NAME}** has been deleted.\nThis could be due to various reasons.\nYou can reapply at any time.`,
+      description: `Your application at **${env.CLAN_NAME}** has been deleted.\nThis could be due to various reasons.\nYou can reapply at any time.`,
       footerText: "Create a ticket for more information",
       color: 0xf49f00,
     };
@@ -62,8 +63,8 @@ const event: ClientEvent = {
     });
 
     await appliedMember.roles.remove([
-      process.env.TRYOUT_PENDING_ROLE!,
-      process.env.WAITLIST_ROLE!,
+      env.TRYOUT_PENDING_ROLE!,
+      env.WAITLIST_ROLE!,
     ]);
 
     const embed = new MessageSender(

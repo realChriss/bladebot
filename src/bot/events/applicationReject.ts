@@ -10,6 +10,7 @@ import {
   getApplication,
 } from "../../utils/applicationActionUtils";
 import { logApplicationAction } from "../../utils/applicationStatsUtils";
+import { env } from "../../env";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -43,14 +44,14 @@ const event: ClientEvent = {
     }
 
     await appliedMember.roles.remove([
-      process.env.WAITLIST_ROLE!,
-      process.env.TRYOUT_PENDING_ROLE!,
+      env.WAITLIST_ROLE!,
+      env.TRYOUT_PENDING_ROLE!,
     ]);
 
     const embedContent: TMessageReplyPayload = {
-      authorName: process.env.CLAN_NAME,
+      authorName: env.CLAN_NAME,
       title: "You have been rejected",
-      description: `You have been rejected from joining **${process.env.CLAN_NAME}**`,
+      description: `You have been rejected from joining **${env.CLAN_NAME}**`,
       footerText: "Create a ticket for more information",
     };
 

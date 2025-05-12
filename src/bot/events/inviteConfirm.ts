@@ -9,6 +9,7 @@ import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 import prisma from "../../db/prisma";
 import { updateOriginalEmbed } from "../../utils/applicationActionUtils";
+import { env } from "../../env";
 
 async function getApplication(interaction: ButtonInteraction) {
   const application = await prisma.application.findFirst({
@@ -55,7 +56,7 @@ const event: ClientEvent = {
       interaction.channel as GuildTextBasedChannel,
       {
         title: "📩 You have been invited to the clan",
-        description: `You have been invited to **${process.env.CLAN_NAME}** in Bladeball!\nCheck your invites.`,
+        description: `You have been invited to **${env.CLAN_NAME}** in Bladeball!\nCheck your invites.`,
       },
       { state: EMessageReplyState.success },
     ).getEmbed();
@@ -66,7 +67,7 @@ const event: ClientEvent = {
       ?.send({ embeds: [dmEmbed] })
       .catch(async () => {
         const mainChat = interaction.guild?.channels.cache.get(
-          process.env.MAIN_CHANNEL!,
+          env.MAIN_CHANNEL,
         );
         if (!mainChat || !mainChat.isSendable()) {
           Logger.error("Main chat not found");

@@ -8,6 +8,7 @@ import axios from "axios";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import ClientSlash from "../classes/ClientSlash";
 import Logger from "../../utils/Logger";
+import { env } from "../../env";
 
 interface RobloxUserData {
   id: number;
@@ -110,7 +111,7 @@ function findDiscordUser(
   robloxUser: string,
   client: Client,
 ): GuildMember | null {
-  const server = client.guilds.cache.get(process.env.SERVER_ID!);
+  const server = client.guilds.cache.get(env.SERVER_ID);
   if (!server) {
     Logger.error(`Server not found`);
     return null;

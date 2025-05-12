@@ -11,6 +11,7 @@ import {
   RESTPostAPIApplicationCommandsJSONBody,
 } from "discord.js";
 import ClientSlash from "./classes/ClientSlash";
+import { env } from "../env";
 
 class CooldownManager {
   private static users = new Map<string, number>();
@@ -165,18 +166,18 @@ export default class SlashHandler {
 
     return {
       isDisabled: isDisabled,
-      isChriss: member.id === process.env.DEV_ID,
-      isDev: Array.from(member.roles.cache.keys()).includes(
-        process.env.DEV_ROLE!,
+      isChriss: member.id === env.DEV_ID,
+      isDev: !!env.DEV_ROLE && Array.from(member.roles.cache.keys()).includes(
+        env.DEV_ROLE,
       ),
       isAdmin: member.permissions.has(PermissionFlagsBits.Administrator),
       isEveryone: true,
-      isBotChannel: channel.id === process.env.BOT_CHANNEL,
+      isBotChannel: channel.id === env.BOT_CHANNEL,
       isDisabledUser: disabledUsers.includes(member.id),
       isDisabledChannel: disabledChannels.includes(channel.id),
       get isStaff() {
         return (
-          member.roles.cache.has(process.env.STAFF_ROLE!) ||
+          member.roles.cache.has(env.STAFF_ROLE) ||
           this.isChriss ||
           this.isDev ||
           this.isAdmin
@@ -205,7 +206,7 @@ export default class SlashHandler {
     ) {
       this.reply(
         interaction,
-        `This command can only be executed in <#${process.env.BOT_CHANNEL}>`,
+        `This command can only be executed in <#${env.BOT_CHANNEL}>`,
       );
       return false;
     } else if (

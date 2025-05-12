@@ -15,6 +15,7 @@ import {
   resolveTargetMember,
   sendDMorFallback,
 } from "../../utils/warnUtils";
+import { env } from "../../env";
 
 interface WarnConfig {
   warnTypeId: number;
@@ -117,7 +118,7 @@ async function createAndNotifyWarn(
   const dmEmbed = new MessageSender(
     null,
     {
-      authorName: process.env.CLAN_NAME,
+      authorName: env.CLAN_NAME,
       title: "Warned",
       description: `You have been warned for not meeting the ${config.warnTypeName} requirement.\n\n**Warn Information:**\n${config.requirementLabel}: ${requirement}\n${config.earnedLabel}: ${earned}\nWarn ID: ${warn.id}\n\nTotal AP Warns: ${apWarnCount}\nTotal Donation Warns: ${donationWarnCount}`,
       footerText: "Open a ticket for more information",
@@ -319,7 +320,7 @@ async function warnListExec(interaction: ChatInputCommandInteraction) {
 
   warns.forEach((warn) => {
     const user = interaction.guild?.members.cache.get(warn.user_id);
-    if (!user || !user.roles.cache.has(process.env.CLAN_ROLE!)) return;
+    if (!user || !user.roles.cache.has(env.CLAN_ROLE)) return;
 
     table.cell("Username", user.displayName.replace(/`/g, "\\`"));
     table.cell("Warns", warn._count.id);

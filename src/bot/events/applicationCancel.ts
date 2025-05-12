@@ -4,6 +4,7 @@ import prisma from "../../db/prisma";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
 import { logApplicationAction } from "../../utils/applicationStatsUtils";
+import { env } from "../../env";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -68,7 +69,7 @@ const event: ClientEvent = {
     });
 
     const applicationChannel = interaction.guild?.channels.cache.get(
-      process.env.APPLICATION_CHANNEL!,
+      env.APPLICATION_CHANNEL,
     );
 
     if (applicationChannel?.isTextBased()) {

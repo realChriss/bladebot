@@ -2,20 +2,21 @@ import ClientEvent from "../classes/ClientEvent";
 import { Events, GuildMember } from "discord.js";
 import Logger from "../../utils/Logger";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
+import { env } from "../../env";
 
 const event: ClientEvent = {
   name: Events.GuildMemberRemove,
   run: async (member: GuildMember) => {
-    if (member.guild.id != process.env.SERVER_ID!) {
+    if (member.guild.id != env.SERVER_ID) {
       return;
     }
 
-    if (member.roles.cache.has(process.env.CLAN_ROLE!) === false) {
+    if (member.roles.cache.has(env.CLAN_ROLE) === false) {
       return;
     }
 
     const applicationChannel = member.guild.channels.cache.get(
-      process.env.APPLICATION_CHANNEL!,
+      env.APPLICATION_CHANNEL,
     );
     if (!applicationChannel || !applicationChannel.isSendable()) {
       Logger.error("Application channel not found");

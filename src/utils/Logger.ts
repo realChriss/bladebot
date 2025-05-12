@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "../env";
 
 type T_LOG_LEVEL = "INFO" | "WARN" | "ERROR";
 
@@ -34,7 +35,7 @@ export default class Logger {
     message: string,
     silent?: boolean,
   ): Promise<boolean | null> {
-    if (process.env.STATE !== "prod") {
+    if (env.STATE !== "prod") {
       return null;
     }
 
@@ -68,18 +69,18 @@ export default class Logger {
     switch (logtype) {
       case E_WEBHOOKS.info:
         return await sendRequest(
-          process.env.INFO_WEBHOOK!,
-          parseInt(process.env.INFO_COLOR!),
+          env.INFO_WEBHOOK,
+          parseInt(env.INFO_COLOR!),
         );
       case E_WEBHOOKS.warn:
         return await sendRequest(
-          process.env.WARN_WEBHOOK!,
-          parseInt(process.env.WARN_COLOR!),
+          env.WARN_WEBHOOK,
+          parseInt(env.WARN_COLOR!),
         );
       case E_WEBHOOKS.error:
         return await sendRequest(
-          process.env.ERROR_WEBHOOK!,
-          parseInt(process.env.ERROR_COLOR!),
+          env.ERROR_WEBHOOK,
+          parseInt(env.ERROR_COLOR!),
         );
     }
   }

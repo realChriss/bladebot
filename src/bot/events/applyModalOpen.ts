@@ -3,6 +3,7 @@ import { ButtonInteraction, Events, Interaction } from "discord.js";
 import { getUserInput } from "../stores/applyModalStore";
 import prisma from "../../db/prisma";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
+import { env } from "../../env";
 
 const cancelApplicationButton = {
   type: 1,
@@ -91,7 +92,7 @@ function userHasClanRole(interaction: ButtonInteraction) {
   );
 
   const roles = Array.from(member?.roles.cache.keys()!);
-  return roles.includes(process.env.CLAN_ROLE!);
+  return roles.includes(env.CLAN_ROLE);
 }
 
 const event: ClientEvent = {

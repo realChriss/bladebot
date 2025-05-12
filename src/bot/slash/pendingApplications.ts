@@ -9,14 +9,13 @@ import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import { application } from "@prisma/client";
 import Emoji from "../assets/emoji";
+import { env } from "../../env";
 
 async function fetchApplicationMessage(
   msgId: string,
   interaction: ChatInputCommandInteraction,
 ): Promise<Message | null> {
-  const channel = interaction.guild?.channels.cache.get(
-    process.env.APPLICATION_CHANNEL!,
-  );
+  const channel = interaction.guild?.channels.cache.get(env.APPLICATION_CHANNEL);
   if (!channel || !channel.isTextBased()) {
     return null;
   }
@@ -39,9 +38,7 @@ async function getApplicationsListString(
           return null;
         }
 
-        const waitlisted = discordUser.roles.cache.has(
-          process.env.WAITLIST_ROLE!,
-        );
+        const waitlisted = discordUser.roles.cache.has(env.WAITLIST_ROLE!);
 
         return {
           username: discordUser.user.displayName,
