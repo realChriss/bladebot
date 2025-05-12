@@ -73,38 +73,54 @@ async function fetchRobloxProfile(
   }
 }
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 async function getRobloxAvatar(
   userId: number,
 ): Promise<RobloxAvatarData | null> {
-  try {
-    const avatarResponse = await axios.get(
-      "https://thumbnails.roblox.com/v1/users/avatar",
-      {
-        params: {
-          userIds: userId,
-          size: "420x420",
-          format: "Png",
-          isCircular: false,
+  const maxRetries = 5;
+  const retryDelay = 1000; // 1 second
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const avatarResponse = await axios.get(
+        "https://thumbnails.roblox.com/v1/users/avatar",
+        {
+          params: {
+            userIds: userId,
+            size: "420x420",
+            format: "Png",
+            isCircular: false,
+          },
+          validateStatus: () => true,
+          timeout: 2000,
         },
-        validateStatus: () => true,
-        timeout: 2000,
-      },
-    );
+      );
 
-    const avatarUrl = avatarResponse.data?.data?.[0]?.imageUrl as string;
-    if (!avatarUrl) {
-      return null;
+      const avatarUrl = avatarResponse.data?.data?.[0]?.imageUrl as string;
+      if (avatarUrl) {
+        const headshotUrl = avatarUrl.replace(/Avatar/g, "AvatarHeadshot");
+        return {
+          avatar: avatarUrl,
+          headshot: headshotUrl,
+        };
+      }
+
+      if (attempt < maxRetries) {
+        Logger.warn(`Attempt ${attempt} failed to get avatar for ${userId}, retrying...`);
+        await delay(retryDelay);
+      }
+    } catch (error) {
+      if (attempt < maxRetries) {
+        Logger.error(`Attempt ${attempt} failed with error for ${userId}: ${error}, retrying...`);
+        await delay(retryDelay);
+      } else {
+        Logger.error(`All attempts failed to fetch Roblox avatar for ${userId}: ${error}`);
+      }
     }
-
-    const headshotUrl = avatarUrl.replace(/Avatar/g, "AvatarHeadshot");
-    return {
-      avatar: avatarUrl,
-      headshot: headshotUrl,
-    };
-  } catch (error) {
-    Logger.error(`Error fetching Roblox avatar: ${error}`);
-    return null;
   }
+
+  return null;
 }
 
 function findDiscordUser(
