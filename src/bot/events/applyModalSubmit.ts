@@ -13,6 +13,7 @@ import { saveUserInput } from "../stores/applyModalStore";
 import prisma from "../../db/prisma";
 import ConfigManager from "../../utils/ConfigManager";
 import client from "../client";
+import { env } from "../../env";
 
 interface ValidationError {
   field: string;
@@ -92,7 +93,7 @@ function userHasClanRole(interaction: ModalSubmitInteraction) {
   );
 
   const roles = Array.from(member?.roles.cache.keys()!);
-  return roles.includes(process.env.CLAN_ROLE!);
+  return roles.includes(env.CLAN_ROLE);
 }
 
 async function getRobloxAvatar(
@@ -239,7 +240,7 @@ async function getDescription(): Promise<string> {
       "Applications are currently closed.\n" +
       "You have been placed on the **waitlist**\n\n";
 
-    const server = client.guilds.cache.get(process.env.SERVER_ID!);
+    const server = client.guilds.cache.get(env.SERVER_ID);
 
     if (server) {
       const position =
@@ -252,7 +253,7 @@ async function getDescription(): Promise<string> {
         ).filter((application) =>
           server.members.cache
             .get(application.user_id)
-            ?.roles.cache.has(process.env.WAITLIST_ROLE!),
+            ?.roles.cache.has(env.WAITLIST_ROLE!),
         ).length + 1;
 
       text += `Your waitlist position: **${position}**`;
@@ -317,7 +318,7 @@ const event: ClientEvent = {
 
     if (validation.valid) {
       const channel = interaction.guild?.channels.cache.get(
-        process.env.APPLICATION_CHANNEL!,
+        env.APPLICATION_CHANNEL,
       );
 
       if (!channel || !channel.isSendable()) {

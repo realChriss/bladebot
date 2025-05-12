@@ -94,7 +94,7 @@ export default class EventHandler {
       ).default;
 
       if (!event) {
-        Logger.error(`Event does not exist in file ${file}`)
+        Logger.error(`Event does not exist in file ${file}`);
       }
 
       const funcsInEvent = this.events.get(event.name);

@@ -25,7 +25,8 @@
     "moment-timezone": "^0.5.46",
     "pg": "^8.13.3",
     "prettier": "^3.5.0",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.41",

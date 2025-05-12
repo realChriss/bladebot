@@ -5,6 +5,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import ClientSlash from "../classes/ClientSlash";
+import { env } from "../../env";
 
 const components = [
   {
@@ -29,9 +30,9 @@ const command: ClientSlash = {
       embeds: [
         {
           author: {
-            name: process.env.CLAN_NAME!,
+            name: env.CLAN_NAME,
           },
-          title: `Apply to ${process.env.CLAN_NAME}`,
+          title: `Apply to ${env.CLAN_NAME}`,
           description:
             "To apply click the button below and answer the questions!",
           color: 0xffffff,

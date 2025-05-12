@@ -9,13 +9,14 @@ import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import Logger from "../../utils/Logger";
 import { application } from "@prisma/client";
+import { env } from "../../env";
 
 async function fetchInviteMessage(
   msgId: string,
   interaction: ChatInputCommandInteraction,
 ): Promise<Message | null> {
   const channel = interaction.guild?.channels.cache.get(
-    process.env.PENDING_INV_CHANNEL!,
+    env.PENDING_INV_CHANNEL,
   );
   if (!channel || !channel.isTextBased()) {
     Logger.error("Invite channel not found");

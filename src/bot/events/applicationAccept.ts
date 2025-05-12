@@ -18,6 +18,7 @@ import {
 } from "../../utils/applicationActionUtils";
 import { application } from "@prisma/client";
 import { logApplicationAction } from "../../utils/applicationStatsUtils";
+import { env } from "../../env";
 
 async function sendPendingInvite(
   interaction: ButtonInteraction,
@@ -25,7 +26,7 @@ async function sendPendingInvite(
   appliedMember: GuildMember,
 ) {
   const invChannel = interaction.guild?.channels.cache.get(
-    process.env.PENDING_INV_CHANNEL!,
+    env.PENDING_INV_CHANNEL,
   );
   if (!invChannel || !invChannel.isSendable()) {
     Logger.error("Invite channel not found");
@@ -91,9 +92,7 @@ async function sendWelcomeMessage(
   appliedMember: GuildMember,
   application: application,
 ) {
-  const mainChat = interaction.guild?.channels.cache.get(
-    process.env.MAIN_CHANNEL!,
-  );
+  const mainChat = interaction.guild?.channels.cache.get(env.MAIN_CHANNEL);
 
   if (mainChat && mainChat.isSendable() && (await ConfigManager.isWlcMsgOn())) {
     await new MessageSender(
@@ -104,7 +103,7 @@ async function sendWelcomeMessage(
         title: `Welcome, ${appliedMember.user.displayName}!`,
         description: `Say hello to our new clan member **${appliedMember.user.displayName}**!`,
         thumbnail: application.roblox_headshot_url || undefined,
-        footerText: process.env.CLAN_NAME,
+        footerText: env.CLAN_NAME,
       },
       { state: EMessageReplyState.success },
     ).sendMessage();
@@ -147,27 +146,22 @@ const event: ClientEvent = {
       return;
     }
 
-    const mainChat = interaction.guild?.channels.cache.get(
-      process.env.MAIN_CHANNEL!,
-    );
+    const mainChat = interaction.guild?.channels.cache.get(env.MAIN_CHANNEL);
     if (!mainChat || !mainChat.isSendable()) {
       Logger.error("Main chat not found");
     }
 
-    await appliedMember.roles.add([
-      process.env.CLAN_ROLE!,
-      process.env.VERIFIED_ROLE!,
-    ]);
+    await appliedMember.roles.add([env.CLAN_ROLE, env.VERIFIED_ROLE!]);
     await appliedMember.roles.remove([
-      process.env.UNVERIFIED_ROLE!,
-      process.env.WAITLIST_ROLE!,
-      process.env.TRYOUT_PENDING_ROLE!,
+      env.UNVERIFIED_ROLE!,
+      env.WAITLIST_ROLE!,
+      env.TRYOUT_PENDING_ROLE!,
     ]);
 
     const embedContent: TMessageReplyPayload = {
-      authorName: process.env.CLAN_NAME,
+      authorName: env.CLAN_NAME,
       title: "You have been accepted",
-      description: `You are now a part of **${process.env.CLAN_NAME}**`,
+      description: `You are now a part of **${env.CLAN_NAME}**`,
       footerText: "You will be added to the Bladeball clan shortly",
     };
 

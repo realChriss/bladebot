@@ -5,6 +5,7 @@ import {
   getAppliedMember,
   getApplication,
 } from "../../utils/applicationActionUtils";
+import { env } from "../../env";
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -28,13 +29,10 @@ const event: ClientEvent = {
       return;
     }
 
-    await appliedMember.roles.add([
-      process.env.WAITLIST_ROLE!,
-      process.env.VERIFIED_ROLE!,
-    ]);
+    await appliedMember.roles.add([env.WAITLIST_ROLE!, env.VERIFIED_ROLE!]);
     await appliedMember.roles.remove([
-      process.env.UNVERIFIED_ROLE!,
-      process.env.TRYOUT_PENDING_ROLE!,
+      env.UNVERIFIED_ROLE!,
+      env.TRYOUT_PENDING_ROLE!,
     ]);
 
     const embed = new MessageSender(
