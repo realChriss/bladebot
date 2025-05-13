@@ -28,6 +28,7 @@ async function sendPendingInvite(
   const invChannel = interaction.guild?.channels.cache.get(
     env.PENDING_INV_CHANNEL,
   );
+
   if (!invChannel || !invChannel.isSendable()) {
     Logger.error("Invite channel not found");
     return;
@@ -36,6 +37,11 @@ async function sendPendingInvite(
   const inviteMsg = new MessageSender(
     invChannel,
     {
+      authorName: appliedMember.displayName,
+      authorImg: appliedMember.displayAvatarURL({
+        size: 128,
+        extension: "webp",
+      }),
       title: "Pending Invite",
       description: `Roblox Username: \`${application.roblox_user}\`\n\nDiscord User: \`${appliedMember.user.username}\`\nDiscord Ping: ${appliedMember.toString()}`,
       thumbnail: application.roblox_headshot_url || undefined,
