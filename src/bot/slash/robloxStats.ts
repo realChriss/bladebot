@@ -73,7 +73,7 @@ async function fetchRobloxProfile(
   }
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function getRobloxAvatar(
   userId: number,
@@ -107,15 +107,21 @@ async function getRobloxAvatar(
       }
 
       if (attempt < maxRetries) {
-        Logger.warn(`Attempt ${attempt} failed to get avatar for ${userId}, retrying...`);
+        Logger.warn(
+          `Attempt ${attempt} failed to get avatar for ${userId}, retrying...`,
+        );
         await delay(retryDelay);
       }
     } catch (error) {
       if (attempt < maxRetries) {
-        Logger.error(`Attempt ${attempt} failed with error for ${userId}: ${error}, retrying...`);
+        Logger.error(
+          `Attempt ${attempt} failed with error for ${userId}: ${error}, retrying...`,
+        );
         await delay(retryDelay);
       } else {
-        Logger.error(`All attempts failed to fetch Roblox avatar for ${userId}: ${error}`);
+        Logger.error(
+          `All attempts failed to fetch Roblox avatar for ${userId}: ${error}`,
+        );
       }
     }
   }
