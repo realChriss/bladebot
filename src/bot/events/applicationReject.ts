@@ -88,7 +88,7 @@ const event: ClientEvent = {
       0xff0000,
     );
 
-    await logApplicationAction(interaction, application, "rejected");
+    await logApplicationAction(application, "rejected", interaction.user.id);
   },
 };
 

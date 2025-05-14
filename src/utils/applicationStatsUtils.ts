@@ -5,9 +5,9 @@ import prisma from "../db/prisma";
 type ApplicationStatus = "accepted" | "rejected" | "cancelled" | "deleted";
 
 export async function logApplicationAction(
-  interaction: ButtonInteraction,
   application: application,
   status: ApplicationStatus,
+  issuerId: string,
 ): Promise<void> {
   await prisma.application_stats.create({
     data: {
@@ -17,7 +17,7 @@ export async function logApplicationAction(
       age: application.age,
       kill_count: application.kill,
       win_count: application.win,
-      processed_by: interaction.member?.user.id,
+      processed_by: issuerId,
       processed_at: new Date(),
       processing_time: Math.floor(
         Date.now() - application.created_at.getTime(),

@@ -3,6 +3,8 @@ import { Events, GuildMember, GuildTextBasedChannel } from "discord.js";
 import Logger from "../../utils/Logger";
 import prisma from "../../db/prisma";
 import { env } from "../../env";
+import { logApplicationAction } from "../../utils/applicationStatsUtils";
+import client from "../client";
 
 async function getApplication(userId: string) {
   const application = await prisma.application.findFirst({
@@ -117,6 +119,8 @@ const event: ClientEvent = {
         });
       }
     }
+
+    await logApplicationAction(application, "cancelled", client.user?.id!)
   },
 };
 
