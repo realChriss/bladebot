@@ -6,7 +6,6 @@ type ApplyStore = {
   killCount: string;
   winCount: string;
   device: string;
-  country: string;
 };
 
 export function saveUserInput(
@@ -16,7 +15,6 @@ export function saveUserInput(
   killCount: string,
   winCount: string,
   device: string,
-  country: string,
 ) {
   userInputStore.set(userId, {
     robloxUsername,
@@ -24,7 +22,6 @@ export function saveUserInput(
     killCount,
     winCount,
     device,
-    country,
   });
 }
 
@@ -36,7 +33,6 @@ export function getUserInput(userId: string): ApplyStore {
       killCount: "",
       winCount: "",
       device: "",
-      country: "",
     }
   );
 }

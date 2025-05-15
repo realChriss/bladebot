@@ -96,20 +96,6 @@ function createPrefilledModal(userId: string) {
           },
         ],
       },
-      {
-        type: 1,
-        components: [
-          {
-            type: 4,
-            custom_id: "country",
-            label: "What country do you live in?",
-            style: 1,
-            required: true,
-            max_length: 20,
-            value: userInput.country || undefined,
-          },
-        ],
-      },
     ],
   };
 }

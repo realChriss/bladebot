@@ -151,7 +151,6 @@ async function validate(
   killCount: string,
   winCount: string,
   device: string,
-  country: string,
 ): Promise<{ valid: boolean; errors?: ValidationError[] }> {
   let store_username = "";
   let store_age = "";
@@ -227,7 +226,6 @@ async function validate(
     store_kill,
     store_win,
     device,
-    country,
   );
 
   return {
@@ -304,7 +302,6 @@ const event: ClientEvent = {
       .getTextInputValue("winCount")
       .replace(/[.,]/g, "");
     const device = interaction.fields.getTextInputValue("device");
-    const country = interaction.fields.getTextInputValue("country");
 
     const application = await prisma.application.findFirst({
       where: {
@@ -327,7 +324,6 @@ const event: ClientEvent = {
       killCount,
       winCount,
       device,
-      country
     );
 
     if (validation.valid) {
@@ -365,7 +361,6 @@ const event: ClientEvent = {
             { name: "Kill Count", value: killCount },
             { name: "Win Count", value: winCount},
             { name: "Device", value: device },
-            { name: "Country", value: country },
           ],
           thumbnail: getAvatar(member, 512),
           image: robloxAvatar?.avatar || undefined,
