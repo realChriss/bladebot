@@ -88,7 +88,7 @@ const command: ClientSlash = {
 
     // Processing times (ms)
     const procTimes = stats
-      .filter((s) => s.processing_time != null)
+      .filter((s) => s.processing_time != null && s.status !== "cancelled")
       .map((s) => s.processing_time!);
     const { average, median, min, max } = calculateTimeStats(procTimes);
     const formattedAverage = formatDuration(average);

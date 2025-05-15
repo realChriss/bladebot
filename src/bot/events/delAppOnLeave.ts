@@ -120,7 +120,7 @@ const event: ClientEvent = {
       }
     }
 
-    await logApplicationAction(application, "cancelled", client.user?.id!)
+    await logApplicationAction(application, "cancelled", client.user?.id!);
   },
 };
 

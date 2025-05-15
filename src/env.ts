@@ -25,14 +25,14 @@ const envSchema = z.object({
   MAIN_CHANNEL: numericString,
   STAFF_CHANNEL: numericString,
   BOT_CHANNEL: numericString,
-  
+
   CLAN_ROLE: numericString,
   STAFF_ROLE: numericString,
   DEV_ROLE: numericString.optional(),
-  
+
   DEV_ID: numericString,
   CHRISS: numericString.default("864209794070741012"),
-  
+
   // Bloodlust
   TRYOUT_CHANNEL: numericString.optional(),
   VERIFIED_ROLE: numericString.optional(),
