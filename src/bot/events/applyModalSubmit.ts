@@ -150,6 +150,7 @@ async function validate(
   age: string,
   killCount: string,
   winCount: string,
+  device: string,
 ): Promise<{ valid: boolean; errors?: ValidationError[] }> {
   let store_username = "";
   let store_age = "";
@@ -218,7 +219,14 @@ async function validate(
     Logger.warn(`Invalid application from ${username} - Errors: ${errorLog}`);
   }
 
-  saveUserInput(userid, store_username, store_age, store_kill, store_win);
+  saveUserInput(
+    userid,
+    store_username,
+    store_age,
+    store_kill,
+    store_win,
+    device,
+  );
 
   return {
     valid: errors.length === 0,
@@ -293,6 +301,7 @@ const event: ClientEvent = {
     const winCount = interaction.fields
       .getTextInputValue("winCount")
       .replace(/[.,]/g, "");
+    const device = interaction.fields.getTextInputValue("device");
 
     const application = await prisma.application.findFirst({
       where: {
@@ -314,6 +323,7 @@ const event: ClientEvent = {
       age,
       killCount,
       winCount,
+      device,
     );
 
     if (validation.valid) {
@@ -347,9 +357,10 @@ const event: ClientEvent = {
               name: "Roblox User",
               value: `Username: \`${robloxUsername}\``,
             },
-            { name: "Age", value: `${age}` },
-            { name: "Kill Count", value: `${killCount}` },
-            { name: "Win Count", value: `${winCount}` },
+            { name: "Age", value: age },
+            { name: "Kill Count", value: killCount },
+            { name: "Win Count", value: winCount},
+            { name: "Device", value: device },
           ],
           thumbnail: getAvatar(member, 512),
           image: robloxAvatar?.avatar || undefined,

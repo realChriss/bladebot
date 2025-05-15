@@ -82,6 +82,20 @@ function createPrefilledModal(userId: string) {
           },
         ],
       },
+      {
+        type: 1,
+        components: [
+          {
+            type: 4,
+            custom_id: "device",
+            label: "What device do you play on?",
+            style: 1,
+            required: true,
+            max_length: 20,
+            value: userInput.device || undefined,
+          },
+        ],
+      },
     ],
   };
 }
