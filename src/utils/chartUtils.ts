@@ -1,83 +1,62 @@
 import { Canvas, createCanvas } from "@napi-rs/canvas";
 import { ChartConfiguration } from "chart.js";
 
-const width = 800;
-const height = 400;
-
 export async function generateChart(
   config: ChartConfiguration,
 ): Promise<Buffer> {
-  const canvas = createCanvas(width, height);
+  const canvas = createCanvas(400, 200);
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, width, height);
-
-  if (config.type === "pie") {
-    await drawPieChart(ctx, config);
-  } else if (config.type === "bar") {
+  if (config.type === "bar") {
     await drawBarChart(ctx, config);
   }
 
   return canvas.toBuffer("image/png");
 }
 
-async function drawPieChart(ctx: any, config: ChartConfiguration) {
-  const data = config.data.datasets[0].data as number[];
-  const colors = config.data.datasets[0].backgroundColor as string[];
-  const total = data.reduce((a, b) => a + b, 0);
-  let startAngle = 0;
-
-  ctx.save();
-  ctx.translate(width / 2, height / 2);
-
-  for (let i = 0; i < data.length; i++) {
-    const sliceAngle = (2 * Math.PI * data[i]) / total;
-
-    ctx.beginPath();
-    ctx.fillStyle = colors[i];
-    ctx.moveTo(0, 0);
-    ctx.arc(
-      0,
-      0,
-      Math.min(width, height) / 3,
-      startAngle,
-      startAngle + sliceAngle,
-    );
-    ctx.closePath();
-    ctx.fill();
-
-    startAngle += sliceAngle;
-  }
-
-  ctx.restore();
-}
-
 async function drawBarChart(ctx: any, config: ChartConfiguration) {
   const data = config.data.datasets[0].data as number[];
-  const color = config.data.datasets[0].backgroundColor as string;
+  const color = "#ffffff";
   const labels = config.data.labels as string[];
+
   const maxValue = Math.max(...data);
 
-  const barWidth = (width - 100) / data.length;
+  const barGap = 5;
+  const barWidth = 30;
+  const totalWidth = data.length * (barWidth + barGap);
+  const width = totalWidth + 100;
+  const height = 300;
+
   const scale = (height - 100) / maxValue;
 
+  ctx.canvas.width = width;
+  ctx.canvas.height = height;
+
+  // Set black background
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, width, height);
+
+  // Draw bars
   ctx.fillStyle = color;
   data.forEach((value, i) => {
     const barHeight = value * scale;
     ctx.fillRect(
-      50 + i * barWidth,
+      50 + i * (barWidth + barGap),
       height - 50 - barHeight,
-      barWidth - 10,
-      barHeight,
+      barWidth,
+      barHeight
     );
   });
 
   // Draw labels
-  ctx.fillStyle = "#000000";
-  ctx.font = "20px Arial";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 16px 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif";
   labels.forEach((label, i) => {
-    ctx.fillText(label, 50 + i * barWidth, height - 30);
+    ctx.fillText(
+      label,
+      50 + i * (barWidth + barGap),
+      height - 20
+    );
   });
 }
 
