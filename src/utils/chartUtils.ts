@@ -91,9 +91,9 @@ export function createTimeRanges(days: number): { start: Date; end: Date } {
 export function calculateAgeDistribution(
   ages: number[],
 ) {
-  const keys = ["-15", "16", "17", "18", "19", "20+"];
+  const keys = ["-15", "16", "17", "18", "19", "20+"] as const;
   
-  const distribution: Record<string, number> = {
+  const distribution: Record<typeof keys[number], number> = {
     "-15": 0,
     "16": 0,
     "17": 0,
