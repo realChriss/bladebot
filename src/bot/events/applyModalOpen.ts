@@ -4,6 +4,7 @@ import { getUserInput } from "../stores/applyModalStore";
 import prisma from "../../db/prisma";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import { env } from "../../env";
+import ConfigManager from "../../utils/ConfigManager";
 
 const cancelApplicationButton = {
   type: 1,
@@ -152,10 +153,16 @@ const event: ClientEvent = {
       return;
     }
 
-    await interaction.showModal(
-      createPrefilledModal(interaction.member?.user.id!),
-    );
-    return;
+    if (await ConfigManager.isAppOpen() === false && interaction.guildId !== "1202836858292404245") {
+      await interaction.reply({
+        content: "❌ Applications are currently closed",
+        ephemeral: true,
+      });
+    } else {
+      await interaction.showModal(
+        createPrefilledModal(interaction.member?.user.id!),
+      );
+    }
   },
 };
 

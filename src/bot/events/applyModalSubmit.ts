@@ -334,7 +334,7 @@ const event: ClientEvent = {
       );
 
       if (!channel || !channel.isSendable()) {
-        Logger.error("❌ Application channel not found");
+        Logger.error("Application channel not found");
         await interaction.editReply({
           content: "Error: Application Channel not found",
         });
