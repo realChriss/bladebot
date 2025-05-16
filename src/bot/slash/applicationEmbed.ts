@@ -31,10 +31,11 @@ const command: ClientSlash = {
         {
           author: {
             name: env.CLAN_NAME,
+            icon_url: interaction.guild?.iconURL() ?? undefined,
           },
-          title: `Apply to ${env.CLAN_NAME}`,
+          title: `Apply to join ${env.CLAN_NAME}`,
           description:
-            "To apply click the button below and answer the questions!",
+            "To apply as a clan member click the button below and answer the questions!",
           color: 0xffffff,
         },
       ],

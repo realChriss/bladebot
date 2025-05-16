@@ -237,26 +237,28 @@ async function validate(
 async function getDescription(): Promise<string> {
   let text = "✅ Application submitted!\n\n";
 
-  if (await ConfigManager.isAppOpen()) {
+  text +=
+    "**What's next?**\n" +
+    "• Watch for pings in this server or DMs from this bot\n" +
+    "• Wait for further instructions\n\n";
+
+  if (await ConfigManager.isAppOpen() === false) {
     text +=
-      "**What's next?**\n" +
-      "• Watch for pings in this server or DMs from this bot\n" +
-      "• Wait for further instructions\n\n" +
-      "Please make sure your DMs are enabled for this server.";
-  } else {
-    text +=
-      "Applications are currently closed.\n" +
-      "You have been placed on the **waitlist**\n\n";
+      "⚠️ **Applications are currently closed.**\n" +
+      "You have been placed on the **waitlist**\n";
 
     const server = client.guilds.cache.get(env.SERVER_ID);
 
-    if (server) {
+    if (server && server.id === "1202836858292404245") {
       const position =
         (
           await prisma.application.findMany({
             where: {
               pending_msg_id: null,
             },
+            select: {
+              user_id: true,
+            }
           })
         ).filter((application) =>
           server.members.cache
