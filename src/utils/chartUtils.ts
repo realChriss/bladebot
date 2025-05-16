@@ -1,6 +1,5 @@
 import { Canvas, createCanvas } from "@napi-rs/canvas";
 import { ChartConfiguration } from "chart.js";
-import { createCanvas as createJSCanvas } from "canvas";
 
 const width = 800;
 const height = 400;
@@ -91,11 +90,11 @@ export function createTimeRanges(days: number): { start: Date; end: Date } {
 
 export function calculateAgeDistribution(
   ages: number[],
-): Record<string, number> {
+) {
+  const keys = ["-15", "16", "17", "18", "19", "20+"];
+  
   const distribution: Record<string, number> = {
-    "< 14": 0,
-    "14": 0,
-    "15": 0,
+    "-15": 0,
     "16": 0,
     "17": 0,
     "18": 0,
@@ -104,17 +103,20 @@ export function calculateAgeDistribution(
   };
 
   ages.forEach((age) => {
-    if (age < 14) distribution["< 14"]++;
-    else if (age == 14) distribution["14"]++;
-    else if (age == 15) distribution["15"]++;
-    else if (age == 16) distribution["16"]++;
-    else if (age == 17) distribution["17"]++;
-    else if (age == 18) distribution["18"]++;
-    else if (age == 19) distribution["19"]++;
+    if (age <= 15) distribution["-15"]++;
+    else if (age === 16) distribution["16"]++;
+    else if (age === 17) distribution["17"]++;
+    else if (age === 18) distribution["18"]++;
+    else if (age === 19) distribution["19"]++;
     else distribution["20+"]++;
   });
 
-  return distribution;
+  const values = keys.map((key) => distribution[key]);
+
+  return {
+    keys,
+    values,
+  };
 }
 
 export function calculateTimeStats(times: number[]): {
