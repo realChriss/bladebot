@@ -242,7 +242,7 @@ async function getDescription(): Promise<string> {
     "• Watch for pings in this server or DMs from this bot\n" +
     "• Wait for further instructions\n\n";
 
-  if (await ConfigManager.isAppOpen() === false) {
+  if ((await ConfigManager.isAppOpen()) === false) {
     text +=
       "⚠️ **Applications are currently closed.**\n" +
       "You have been placed on the **waitlist**\n";
@@ -258,7 +258,7 @@ async function getDescription(): Promise<string> {
             },
             select: {
               user_id: true,
-            }
+            },
           })
         ).filter((application) =>
           server.members.cache
@@ -361,7 +361,7 @@ const event: ClientEvent = {
             },
             { name: "Age", value: age },
             { name: "Kill Count", value: killCount },
-            { name: "Win Count", value: winCount},
+            { name: "Win Count", value: winCount },
             { name: "Device", value: device },
           ],
           thumbnail: getAvatar(member, 512),

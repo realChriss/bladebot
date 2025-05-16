@@ -44,7 +44,7 @@ async function drawBarChart(ctx: any, config: ChartConfiguration) {
       50 + i * (barWidth + barGap),
       height - 50 - barHeight,
       barWidth,
-      barHeight
+      barHeight,
     );
   });
 
@@ -52,11 +52,7 @@ async function drawBarChart(ctx: any, config: ChartConfiguration) {
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 16px 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif";
   labels.forEach((label, i) => {
-    ctx.fillText(
-      label,
-      50 + i * (barWidth + barGap),
-      height - 20
-    );
+    ctx.fillText(label, 50 + i * (barWidth + barGap), height - 20);
   });
 }
 
@@ -67,12 +63,10 @@ export function createTimeRanges(days: number): { start: Date; end: Date } {
   return { start, end };
 }
 
-export function calculateAgeDistribution(
-  ages: number[],
-) {
+export function calculateAgeDistribution(ages: number[]) {
   const keys = ["-15", "16", "17", "18", "19", "20+"] as const;
-  
-  const distribution: Record<typeof keys[number], number> = {
+
+  const distribution: Record<(typeof keys)[number], number> = {
     "-15": 0,
     "16": 0,
     "17": 0,

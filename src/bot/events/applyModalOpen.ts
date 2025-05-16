@@ -153,7 +153,10 @@ const event: ClientEvent = {
       return;
     }
 
-    if (await ConfigManager.isAppOpen() === false && interaction.guildId !== "1202836858292404245") {
+    if (
+      (await ConfigManager.isAppOpen()) === false &&
+      interaction.guildId !== "1202836858292404245"
+    ) {
       await interaction.reply({
         content: "❌ Applications are currently closed",
         ephemeral: true,
