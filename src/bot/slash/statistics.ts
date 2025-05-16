@@ -112,11 +112,11 @@ const command: ClientSlash = {
     const ageChart = await generateChart({
       type: "bar",
       data: {
-        labels: Object.keys(ageDistribution),
+        labels: ageDistribution.keys,
         datasets: [
           {
             label: "Age Distribution",
-            data: Object.values(ageDistribution),
+            data: ageDistribution.values,
             backgroundColor: "#3498db",
           },
         ],
