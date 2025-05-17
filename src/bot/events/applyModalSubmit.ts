@@ -116,21 +116,41 @@ async function getRobloxAvatar(
     return null;
   }
 
-  const avatarResponse = await axios.get(
-    `https://thumbnails.roblox.com/v1/users/avatar`,
-    {
-      params: {
-        userIds: userId,
-        size: "420x420",
-        format: "Png",
-        isCircular: false,
-      },
-      validateStatus: () => true,
-      timeout: 2000,
-    },
-  );
+  const sendAvatarReq = async function () {
+    try {
+      const avatarResponse = await axios.get(
+        `https://thumbnails.roblox.com/v1/users/avatar`,
+        {
+          params: {
+            userIds: userId,
+            size: "420x420",
+            format: "Png",
+            isCircular: false,
+          },
+          validateStatus: () => true,
+          timeout: 2000,
+        },
+      );
+      return avatarResponse;
+    } catch (error) {
+      Logger.error(`Error fetching Roblox avatar: ${error}`);
+      return null;
+    }
+  };
 
-  const avatarUrl = avatarResponse.data?.data?.[0]?.imageUrl as string;
+  let avatarUrl = "";
+  
+  for (let i = 0; i < 5; i++) {
+    const avatarResponse = await sendAvatarReq();
+    if (avatarResponse && avatarResponse.status === 200) {
+      const avatar = avatarResponse.data?.data?.[0]?.imageUrl as string;
+      if (avatar) {
+        avatarUrl = avatar;
+        break;
+      }
+    }
+  }
+
   if (!avatarUrl) {
     return null;
   }
