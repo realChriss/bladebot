@@ -139,7 +139,7 @@ async function getRobloxAvatar(
   };
 
   let avatarUrl = "";
-  
+
   for (let i = 0; i < 5; i++) {
     const avatarResponse = await sendAvatarReq();
     if (avatarResponse && avatarResponse.status === 200) {
