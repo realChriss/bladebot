@@ -151,6 +151,7 @@ Processing Time:
 • Min: **${formattedMin}**
 • Max: **${formattedMax}**
         `,
+        color: 0xffffff,
       },
       { state: EMessageReplyState.success },
     ).getEmbed();
@@ -160,6 +161,7 @@ Processing Time:
       {
         title: "Age Distribution",
         image: "attachment://age.png",
+        color: 0xffffff,
       },
       { state: EMessageReplyState.success },
     ).getEmbed();
