@@ -19,6 +19,7 @@ import {
 import { application } from "@prisma/client";
 import { logApplicationAction } from "../../utils/applicationStatsUtils";
 import { env } from "../../env";
+import { normalizeToAscii } from "../../utils/stringUtils";
 
 async function sendPendingInvite(
   interaction: ButtonInteraction,
@@ -75,22 +76,31 @@ async function updateNickname(
   appliedMember: GuildMember,
   application: application,
 ) {
-  const displayName = appliedMember.displayName;
-  const nickname = `${appliedMember.user.globalName || appliedMember.user.username} (${application.roblox_user})`;
+  const nickname = `${normalizeToAscii(appliedMember.user.displayName)} (${application.roblox_user})`;
 
-  if (nickname.length <= 32) {
-    await appliedMember.setNickname(nickname).catch(() => {
-      Logger.warn(`Could not set nickname for ${appliedMember.user.username}`);
-    });
-  } else {
-    await new MessageSender(
+  const sendError = (msg: string) => {
+    Logger.error(msg);
+    new MessageSender(
       interaction.channel as SendableChannels,
       {
-        description: `New nickname for **${displayName}** is longer than 32 chars`,
+        description: msg,
       },
       { state: EMessageReplyState.error },
     ).sendMessage();
+  };
+
+  if (nickname.length > 32) {
+    sendError(
+      `Nickname too long for **${appliedMember.user.username}**: ${nickname.length} characters`,
+    );
+    return;
   }
+
+  await appliedMember.setNickname(nickname).catch((err) => {
+    sendError(
+      `Could not set nickname for **${appliedMember.user.username}**: ${err.message}`,
+    );
+  });
 }
 
 async function sendWelcomeMessage(
