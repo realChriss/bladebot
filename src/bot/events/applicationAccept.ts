@@ -19,6 +19,7 @@ import {
 import { application } from "@prisma/client";
 import { logApplicationAction } from "../../utils/applicationStatsUtils";
 import { env } from "../../env";
+import { normalizeString } from "../../utils/stringUtils";
 
 async function sendPendingInvite(
   interaction: ButtonInteraction,
@@ -75,7 +76,7 @@ async function updateNickname(
   appliedMember: GuildMember,
   application: application,
 ) {
-  const nickname = `${appliedMember.user.displayName} (${application.roblox_user})`;
+  const nickname = `${normalizeString(appliedMember.user.displayName)} (${application.roblox_user})`;
 
   const sendError = (msg: string) => {
     Logger.error(msg);

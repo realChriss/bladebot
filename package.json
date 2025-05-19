@@ -26,11 +26,13 @@
     "pg": "^8.13.3",
     "prettier": "^3.5.0",
     "prisma": "^5.22.0",
+    "unidecode": "^1.1.0",
     "zod": "^3.24.4"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.41",
     "@types/node": "^22.8.6",
+    "@types/unidecode": "^1.1.0",
     "esbuild": "^0.25.0",
     "typescript": "^5.6.3"
   }

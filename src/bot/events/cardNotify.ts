@@ -1,7 +1,16 @@
 import ClientEvent from "../classes/ClientEvent";
 import { Events, Message, EmbedBuilder } from "discord.js";
 
-const keywords = ["lucy", "emilia", "forcedivorce", "are now married", "nagatoro", "gojo", "miku", "megumin"];
+const keywords = [
+  "lucy",
+  "emilia",
+  "forcedivorce",
+  "are now married",
+  "nagatoro",
+  "gojo",
+  "miku",
+  "megumin",
+];
 
 const event: ClientEvent = {
   name: Events.MessageCreate,
