@@ -76,7 +76,14 @@ async function updateNickname(
   appliedMember: GuildMember,
   application: application,
 ) {
-  const nickname = `${normalizeString(appliedMember.user.displayName)} (${application.roblox_user})`;
+  const normalizedName = normalizeString(appliedMember.user.username);
+  const nickname = `${normalizedName} (${application.roblox_user})`;
+
+  if (normalizedName !== appliedMember.user.username) {
+    Logger.info(
+      `Normalized name for **${appliedMember.user.username}** to **${normalizedName}**`,
+    );
+  }
 
   const sendError = (msg: string) => {
     Logger.error(msg);
