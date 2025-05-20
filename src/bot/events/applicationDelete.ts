@@ -1,5 +1,5 @@
 import ClientEvent from "../classes/ClientEvent";
-import { Events, Interaction, ButtonInteraction } from "discord.js";
+import { Events, Interaction, ButtonInteraction, SendableChannels } from "discord.js";
 import prisma from "../../db/prisma";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import Logger from "../../utils/Logger";
@@ -55,10 +55,14 @@ const event: ClientEvent = {
     }).getEmbed();
 
     await sendDMWithFallback(appliedMember, dmEmbed, async () => {
-      const error = `Could not DM ${appliedMember.user.username}`;
-      if (interaction.channel?.isSendable()) {
-        await interaction.channel.send(error);
-      }
+      const error = `Could not send DM to ${appliedMember.user.username}`;
+      await new MessageSender(
+        interaction.channel as SendableChannels,
+        {
+          description: error,
+        },
+        { state: EMessageReplyState.error },
+      ).sendMessage();
       Logger.warn(error);
     });
 
