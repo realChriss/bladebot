@@ -10,7 +10,7 @@ export function normalizeString(str: string): string {
       continue;
     }
 
-    if (/^[\x00-\x7F]$/.test(char)) {
+    if (/^[\x00-\x7F]$/.test(char) && !/^\d$/.test(char)) {
       result.push(char);
       continue;
     }
