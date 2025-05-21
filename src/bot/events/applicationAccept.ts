@@ -79,12 +79,6 @@ async function updateNickname(
   const normalizedName = normalizeString(appliedMember.user.displayName);
   const nickname = `${normalizedName} (${application.roblox_user})`;
 
-  if (normalizedName !== appliedMember.user.displayName) {
-    Logger.info(
-      `Normalized name for **${appliedMember.user.displayName}** to **${normalizedName}**`,
-    );
-  }
-
   const sendError = (msg: string) => {
     Logger.error(msg);
     new MessageSender(
@@ -103,7 +97,20 @@ async function updateNickname(
     return;
   }
 
-  await appliedMember.setNickname(nickname).catch((err) => {
+  await appliedMember.setNickname(nickname)
+  .then(() => {
+    if (normalizedName !== appliedMember.user.displayName) {
+      new MessageSender(
+        interaction.channel as SendableChannels,
+        {
+          description: `Normalized name for **${appliedMember.user.displayName}** to **${normalizedName}**`,
+          color: 0xffffff,
+        },
+        { state: EMessageReplyState.none },
+      ).sendMessage();
+    }
+  })
+  .catch((err) => {
     sendError(
       `Could not set nickname for **${appliedMember.user.username}**: ${err.message}`,
     );
