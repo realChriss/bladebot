@@ -79,9 +79,9 @@ async function updateNickname(
   const normalizedName = normalizeString(appliedMember.user.displayName);
   const nickname = `${normalizedName} (${application.roblox_user})`;
 
-  if (normalizedName !== appliedMember.user.username) {
+  if (normalizedName !== appliedMember.user.displayName) {
     Logger.info(
-      `Normalized name for **${appliedMember.user.username}** to **${normalizedName}**`,
+      `Normalized name for **${appliedMember.user.displayName}** to **${normalizedName}**`,
     );
   }
 
