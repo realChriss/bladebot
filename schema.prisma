@@ -8,8 +8,9 @@ generator client {
 }
 
 model application {
-  user_id                 String
-  msg_id                  String
+  id                      Int       @id @default(autoincrement())
+  user_id                 String    
+  msg_id                  String    @unique
   discord_user            String?
   roblox_user             String?
   roblox_avatar_url       String?
@@ -18,10 +19,19 @@ model application {
   age                     Int?
   kill                    Int?
   win                     Int?
-  created_at              DateTime     @default(now()) @db.Timestamp
+  created_at              DateTime     @default(now()) @db.Timestamp               
 
-  @@id([user_id, msg_id])
   @@map("application")
+}
+
+model application_status_type {
+  id               Int          @id @default(autoincrement())
+  name             String       @db.VarChar
+  description      String?      @db.Text
+  created_at       DateTime     @default(now()) @db.Timestamp
+  applications     application[]
+
+  @@map("application_status_type")
 }
 
 model warn_type {
