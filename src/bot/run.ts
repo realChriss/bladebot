@@ -34,13 +34,6 @@ async function initEvents() {
 
 function initRPC() {
   client.user?.setPresence({
-    activities: [
-      {
-        name: env.CLAN_NAME,
-        type: ActivityType.Competing,
-        state: "Made by @realchriss",
-      },
-    ],
     status: "dnd",
   });
 }
