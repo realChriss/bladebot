@@ -97,24 +97,25 @@ async function updateNickname(
     return;
   }
 
-  await appliedMember.setNickname(nickname)
-  .then(() => {
-    if (normalizedName !== appliedMember.user.displayName) {
-      new MessageSender(
-        interaction.channel as SendableChannels,
-        {
-          description: `Normalized name for **${appliedMember.user.displayName}** to **${normalizedName}**`,
-          color: 0xffffff,
-        },
-        { state: EMessageReplyState.none },
-      ).sendMessage();
-    }
-  })
-  .catch((err) => {
-    sendError(
-      `Could not set nickname for **${appliedMember.user.username}**: ${err.message}`,
-    );
-  });
+  await appliedMember
+    .setNickname(nickname)
+    .then(() => {
+      if (normalizedName !== appliedMember.user.displayName) {
+        new MessageSender(
+          interaction.channel as SendableChannels,
+          {
+            description: `Normalized name for **${appliedMember.user.displayName}** to **${normalizedName}**`,
+            color: 0xffffff,
+          },
+          { state: EMessageReplyState.none },
+        ).sendMessage();
+      }
+    })
+    .catch((err) => {
+      sendError(
+        `Could not set nickname for **${appliedMember.user.username}**: ${err.message}`,
+      );
+    });
 }
 
 async function sendWelcomeMessage(

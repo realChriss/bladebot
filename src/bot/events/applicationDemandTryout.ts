@@ -141,7 +141,7 @@ const event: ClientEvent = {
 
     await appliedMember.roles.add(env.TRYOUT_PENDING_ROLE!);
 
-    await tryoutChannel.send({
+    const tryoutMessage = await tryoutChannel.send({
       content: `${appliedMember.toString()} <@&${userRegion.tryouterRoleId}>`,
       embeds: [tryoutEmbed],
     });
@@ -151,7 +151,7 @@ const event: ClientEvent = {
       {
         authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.displayName,
-        description: `⚔️ Added **${appliedMember.user.username}** to tryout queue.\nRegion: **${userRegion.name}**`,
+        description: `⚔️ Added **${appliedMember.user.username}** to tryout queue.\nRegion: **${userRegion.name}** | [[Message]](${tryoutMessage.url})`,
         footerText: interaction.user.username,
       },
       { state: EMessageReplyState.success },
