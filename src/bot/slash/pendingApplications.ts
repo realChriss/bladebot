@@ -43,7 +43,7 @@ async function getApplicationsListString(
         const waitlisted = discordUser.roles.cache.has(env.WAITLIST_ROLE!);
 
         return {
-          username: discordUser.user.displayName,
+          username: discordUser.displayName,
           url: message ? `[Jump](${message.url})` : "_Url Not Found_",
           timestamp: message
             ? `<t:${Math.floor(message.createdTimestamp / 1000)}:R>`
