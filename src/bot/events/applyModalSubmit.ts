@@ -407,6 +407,7 @@ const event: ClientEvent = {
           age: parseInt(age),
           kill: parseInt(killCount),
           win: parseInt(winCount),
+          device: device,
           roblox_avatar_url: robloxAvatar?.avatar,
           roblox_headshot_url: robloxAvatar?.headshot,
         },

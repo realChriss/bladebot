@@ -7,6 +7,8 @@ import {
 } from "../../utils/applicationActionUtils";
 import Emoji from "../assets/emoji";
 import { env } from "../../env";
+import prisma from "../../db/prisma";
+import { buildMessageUrl } from "../../utils/stringUtils";
 
 type Regions = Record<string, { name: string; tryouterRoleId: string }>;
 
@@ -32,6 +34,10 @@ const regions: Regions = {
     tryouterRoleId: env.AU_TRYOUTER_ROLE!,
   },
 };
+
+function getTryoutMsgUrl(msgId: string): string {
+  return buildMessageUrl(env.TRYOUT_CHANNEL!, msgId);
+}
 
 const event: ClientEvent = {
   name: Events.InteractionCreate,
@@ -61,7 +67,7 @@ const event: ClientEvent = {
         {
           authorImg: appliedMember.displayAvatarURL(),
           authorName: appliedMember.displayName,
-          description: `❌ **${appliedMember.user.username}** is already in the tryout queue.`,
+          description: `❌ **${appliedMember.user.username}** is already in the tryout queue.\n${application.tryout_msg_id ? `Tryout Message: [[Message]](${getTryoutMsgUrl(application.tryout_msg_id)})` : ""}`,
           footerText: interaction.user.username,
         },
         { state: EMessageReplyState.error },
@@ -144,6 +150,18 @@ const event: ClientEvent = {
     const tryoutMessage = await tryoutChannel.send({
       content: `${appliedMember.toString()} <@&${userRegion.tryouterRoleId}>`,
       embeds: [tryoutEmbed],
+    });
+
+    await prisma.application.update({
+      where: {
+        user_id_msg_id: {
+          user_id: application.user_id,
+          msg_id: application.msg_id,
+        },
+      },
+      data: {
+        tryout_msg_id: tryoutMessage.id,
+      },
     });
 
     const successEmbed = new MessageSender(

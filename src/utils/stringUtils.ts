@@ -1,4 +1,5 @@
 import unidecode from "unidecode";
+import { env } from "../env";
 
 export function normalizeString(str: string): string {
   const chars = [...str.normalize("NFKD").trim()];
@@ -35,4 +36,8 @@ export function normalizeString(str: string): string {
   }
 
   return result.join("");
+}
+
+export function buildMessageUrl(channelId: string, messageId: string): string {
+  return `https://discord.com/channels/${env.SERVER_ID}/${channelId}/${messageId}`;
 }
