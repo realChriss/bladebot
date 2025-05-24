@@ -41,6 +41,9 @@ async function getApplicationsListString(
         }
 
         const waitlisted = discordUser.roles.cache.has(env.WAITLIST_ROLE!);
+        const tryoutPending = discordUser.roles.cache.has(
+          env.TRYOUT_PENDING_ROLE!,
+        );
 
         return {
           username: discordUser.displayName,
@@ -50,6 +53,7 @@ async function getApplicationsListString(
             : "_No Time_",
           createdTimestamp: message?.createdTimestamp || 0,
           waitlisted: waitlisted,
+          tryoutPending: tryoutPending,
         };
       }),
     )
@@ -58,14 +62,14 @@ async function getApplicationsListString(
     .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
     .map(
       (data) =>
-        `${data.username} — ${data.timestamp} — ${data.url} ${data.waitlisted ? Emoji.waitlist : ""}`,
+        `${data.username} — ${data.timestamp} — ${data.url} ${data.waitlisted ? Emoji.waitlist : ""} ${data.tryoutPending ? Emoji.tryout : ""}`,
     )
     .join("\n");
 }
 
 function buildEmbedDescription(applicationCount: number, listString: string) {
   if (applicationCount > 0) {
-    return `There ${applicationCount !== 1 ? "are" : "is"} ${applicationCount} pending applications\n\n**Pending Applications**\n${listString}\n\n*<:waitlist:1360251417423777824> = Waitlisted user*`;
+    return `There ${applicationCount !== 1 ? "are" : "is"} ${applicationCount} pending applications\n\n**Pending Applications**\n${listString}\n\n[${Emoji.waitlist}] *Waitlisted user*\n[${Emoji.tryout}] *Tryout pending*`;
   }
 
   return `There are no pending applications`;
