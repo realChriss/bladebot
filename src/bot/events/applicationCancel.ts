@@ -21,7 +21,6 @@ const event: ClientEvent = {
     const application = await prisma.application.findFirst({
       where: {
         user_id: interaction.user.id,
-        pending_msg_id: null,
       },
     });
 
@@ -30,6 +29,22 @@ const event: ClientEvent = {
         null,
         {
           description: "No active application found.",
+        },
+        { state: EMessageReplyState.error },
+      ).getEmbed();
+
+      await interaction.editReply({
+        embeds: [embed],
+        components: [],
+      });
+      return;
+    }
+
+    if (application.pending_msg_id !== null) {
+      const embed = new MessageSender(
+        null,
+        {
+          description: "You cannot cancel an application that has been accepted.",
         },
         { state: EMessageReplyState.error },
       ).getEmbed();
