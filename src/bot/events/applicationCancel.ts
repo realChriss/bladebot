@@ -44,7 +44,8 @@ const event: ClientEvent = {
       const embed = new MessageSender(
         null,
         {
-          description: "You cannot cancel an application that has been accepted.",
+          description:
+            "You cannot cancel an application that has been accepted.",
         },
         { state: EMessageReplyState.error },
       ).getEmbed();

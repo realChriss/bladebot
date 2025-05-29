@@ -128,7 +128,7 @@ const event: ClientEvent = {
         },
         { state: EMessageReplyState.error },
       ).getEmbed();
-      
+
       await interaction.reply({
         embeds: [errorEmbed],
         ephemeral: true,
