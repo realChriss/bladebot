@@ -25,6 +25,7 @@ async function sendPendingInvite(
   interaction: ButtonInteraction,
   application: application,
   appliedMember: GuildMember,
+  normalizedName: string,
 ) {
   const invChannel = interaction.guild?.channels.cache.get(
     env.PENDING_INV_CHANNEL,
@@ -38,7 +39,7 @@ async function sendPendingInvite(
   const inviteMsg = new MessageSender(
     invChannel,
     {
-      authorName: appliedMember.displayName,
+      authorName: normalizedName,
       authorImg: appliedMember.displayAvatarURL({
         size: 128,
         extension: "webp",
@@ -75,9 +76,10 @@ async function updateNickname(
   interaction: ButtonInteraction,
   appliedMember: GuildMember,
   application: application,
+  normalizedName: string,
 ) {
-  const normalizedName = normalizeString(appliedMember.user.displayName);
   const nickname = `${normalizedName} (${application.roblox_user})`;
+  const oldName = appliedMember.displayName;
 
   const sendError = (msg: string) => {
     Logger.error(msg);
@@ -100,11 +102,11 @@ async function updateNickname(
   await appliedMember
     .setNickname(nickname)
     .then(() => {
-      if (normalizedName !== appliedMember.user.displayName) {
+      if (normalizedName !== oldName) {
         new MessageSender(
           interaction.channel as SendableChannels,
           {
-            description: `Normalized name for **${appliedMember.user.displayName}** to **${normalizedName}**`,
+            description: `Normalized name for **${oldName}** to **${normalizedName}**`,
             color: 0xffffff,
           },
           { state: EMessageReplyState.none },
@@ -122,6 +124,7 @@ async function sendWelcomeMessage(
   interaction: ButtonInteraction,
   appliedMember: GuildMember,
   application: application,
+  normalizedName: string,
 ) {
   const mainChat = interaction.guild?.channels.cache.get(env.MAIN_CHANNEL);
 
@@ -131,8 +134,8 @@ async function sendWelcomeMessage(
       {
         authorImg: appliedMember.displayAvatarURL(),
         authorName: appliedMember.displayName,
-        title: `Welcome, ${appliedMember.user.displayName}!`,
-        description: `Say hello to our new clan member **${appliedMember.user.displayName}**!`,
+        title: `Welcome, ${normalizedName}!`,
+        description: `Say hello to our new clan member **${normalizedName}**!`,
         thumbnail: application.roblox_headshot_url || undefined,
         footerText: env.CLAN_NAME,
       },
@@ -177,6 +180,8 @@ const event: ClientEvent = {
       return;
     }
 
+    const normalizedName = normalizeString(appliedMember.displayName);
+
     const mainChat = interaction.guild?.channels.cache.get(env.MAIN_CHANNEL);
     if (!mainChat || !mainChat.isSendable()) {
       Logger.error("Main chat not found");
@@ -217,7 +222,7 @@ const event: ClientEvent = {
       null,
       {
         authorImg: appliedMember.displayAvatarURL(),
-        authorName: appliedMember.displayName,
+        authorName: normalizedName,
         description: `✅ Accepted **${appliedMember.user.username}**'s application`,
         footerText: interaction.user.username,
       },
@@ -234,9 +239,24 @@ const event: ClientEvent = {
       0x04ff00,
     );
 
-    await sendPendingInvite(interaction, application, appliedMember);
-    await updateNickname(interaction, appliedMember, application);
-    await sendWelcomeMessage(interaction, appliedMember, application);
+    await sendPendingInvite(
+      interaction,
+      application,
+      appliedMember,
+      normalizedName,
+    );
+    await updateNickname(
+      interaction,
+      appliedMember,
+      application,
+      normalizedName,
+    );
+    await sendWelcomeMessage(
+      interaction,
+      appliedMember,
+      application,
+      normalizedName,
+    );
 
     await logApplicationAction(application, "accepted", interaction.user.id);
   },
