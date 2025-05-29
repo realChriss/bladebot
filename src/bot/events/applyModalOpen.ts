@@ -121,8 +121,16 @@ const event: ClientEvent = {
     }
 
     if (userHasClanRole(interaction)) {
+      const errorEmbed = new MessageSender(
+        null,
+        {
+          description: "You already have the clan role.",
+        },
+        { state: EMessageReplyState.error },
+      ).getEmbed();
+      
       await interaction.reply({
-        content: "You are already in the clan",
+        embeds: [errorEmbed],
         ephemeral: true,
       });
       return;
