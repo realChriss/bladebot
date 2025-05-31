@@ -31,8 +31,6 @@ const command: ClientSlash = {
         .setRequired(false),
     ) as SlashCommandBuilder,
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
-    await interaction.deferReply();
-
     const user = interaction.options.getUser("user");
     const messageId = interaction.options.getString("message-id");
 
@@ -45,7 +43,23 @@ const command: ClientSlash = {
         { state: EMessageReplyState.error },
       ).getEmbed();
 
-      await interaction.editReply({
+      await interaction.reply({
+        embeds: [errorEmbed],
+      });
+      return;
+    }
+
+    const member = interaction.guild?.members.cache.get(user?.id!);
+    if (!member) {
+      const errorEmbed = new MessageSender(
+        null,
+        {
+          description: "Could not find this user in the server",
+        },
+        { state: EMessageReplyState.error },
+      ).getEmbed();
+
+      await interaction.reply({
         embeds: [errorEmbed],
       });
       return;
@@ -60,29 +74,13 @@ const command: ClientSlash = {
         null,
         {
           description: user
-            ? `No application found for ${user.toString()}`
+            ? `No application found for ${member.displayName}`
             : "No application found with that message ID",
         },
         { state: EMessageReplyState.error },
       ).getEmbed();
 
-      await interaction.editReply({
-        embeds: [errorEmbed],
-      });
-      return;
-    }
-
-    const member = await interaction.guild?.members.fetch(application.user_id);
-    if (!member) {
-      const errorEmbed = new MessageSender(
-        null,
-        {
-          description: "Could not find this user in the server anymore",
-        },
-        { state: EMessageReplyState.error },
-      ).getEmbed();
-
-      await interaction.editReply({
+      await interaction.reply({
         embeds: [errorEmbed],
       });
       return;
@@ -132,7 +130,7 @@ const command: ClientSlash = {
       { state: EMessageReplyState.none },
     ).getEmbed();
 
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [applicationEmbed],
     });
   },
