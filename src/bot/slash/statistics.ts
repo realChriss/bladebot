@@ -14,6 +14,23 @@ import {
   generateChart,
 } from "../../utils/chartUtils";
 import { formatDuration } from "../../utils/applicationStatsUtils";
+import { application_stats } from "@prisma/client";
+
+async function getStatRows(days: number | null): Promise<application_stats[]> {
+  let whereClause = {};
+
+  if (days) {
+    const { start, end } = createTimeRanges(days);
+    whereClause = {
+      created_at: { gte: start, lte: end },
+    };
+  }
+
+  const stats = await prisma.application_stats.findMany({
+    where: whereClause,
+  });
+  return stats;
+}
 
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
@@ -22,20 +39,14 @@ const command: ClientSlash = {
     .addIntegerOption((option) =>
       option
         .setName("days")
-        .setDescription("Number of days to show statistics for (default: 30)")
+        .setDescription("Number of days to show statistics (default: all)")
         .setRequired(false),
     ) as SlashCommandBuilder,
-
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
-    const days = interaction.options.getInteger("days") || 30;
-    const { start, end } = createTimeRanges(days);
+    const days = interaction.options.getInteger("days");
 
-    const stats = await prisma.application_stats.findMany({
-      where: {
-        created_at: { gte: start, lte: end },
-      },
-    });
+    const stats = await getStatRows(days);
 
     if (stats.length === 0) {
       const noStats = new MessageSender(
@@ -171,7 +182,6 @@ Processing Time:
       files: [ageAttachment],
     });
   },
-
   options: {
     isDisabled: false,
     onlyBotChannel: false,
