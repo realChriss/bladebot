@@ -125,6 +125,7 @@ const command: ClientSlash = {
           },
         ],
         image: application.roblox_avatar_url || undefined,
+        footerText: interaction.user.username,
         color: 0xffffff,
       },
       { state: EMessageReplyState.none },
