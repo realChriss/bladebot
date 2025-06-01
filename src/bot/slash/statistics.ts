@@ -51,7 +51,7 @@ const command: ClientSlash = {
     if (stats.length === 0) {
       const noStats = new MessageSender(
         null,
-        { description: `No application statistics for the last ${days} days.` },
+        { description: `No application statistics found` },
         { state: EMessageReplyState.error },
       ).getEmbed();
       await interaction.editReply({ embeds: [noStats] });
@@ -144,7 +144,7 @@ const command: ClientSlash = {
     const statsEmbed = new MessageSender(
       null,
       {
-        title: `Application Statistics (Last ${days} days)`,
+        title: `Application Statistics ${days ? `(Last ${days} days)` : ""}`,
         description: `
 Total Applications: **${totalApplications}**
 Accepted: **${accepted}** (${pct(accepted)}%)
