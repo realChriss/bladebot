@@ -40,7 +40,8 @@ const command: ClientSlash = {
       option
         .setName("days")
         .setDescription("Number of days to show statistics (default: all)")
-        .setRequired(false),
+        .setRequired(false)
+        .setMaxValue(3650),
     ) as SlashCommandBuilder,
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
