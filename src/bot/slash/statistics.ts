@@ -163,6 +163,7 @@ Processing Time:
 • Min: **${formattedMin}**
 • Max: **${formattedMax}**
         `,
+        footerText: interaction.user.username,
         color: 0xffffff,
       },
       { state: EMessageReplyState.success },
