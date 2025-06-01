@@ -17,20 +17,45 @@ import { formatDuration } from "../../utils/applicationStatsUtils";
 import { application_stats } from "@prisma/client";
 
 async function getStatRows(days: number | null): Promise<application_stats[]> {
-  let whereClause = {};
-
-  if (days) {
-    const { start, end } = createTimeRanges(days);
-    whereClause = {
-      created_at: { gte: start, lte: end },
-    };
+  if (!days) {
+    return await prisma.application_stats.findMany();
   }
 
-  const stats = await prisma.application_stats.findMany({
-    where: whereClause,
+  const { start, end } = createTimeRanges(days);
+  return await prisma.application_stats.findMany({
+    where: { created_at: { gte: start, lte: end } },
   });
-  return stats;
 }
+
+function countByStatus(
+  stats: application_stats[],
+  statuses: string[],
+): Record<string, number> {
+  return stats.reduce(
+    (acc, s) => {
+      const key = s.status;
+      if (statuses.includes(key)) {
+        acc[key] = (acc[key] || 0) + 1;
+      }
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+}
+
+function extractValues(
+  stats: application_stats[],
+  field: keyof application_stats,
+): number[] {
+  return stats.map((s) => s[field]).filter((v) => typeof v === "number");
+}
+
+function computeAverage(values: number[]): number {
+  if (values.length === 0) return 0;
+  return values.reduce((sum, v) => sum + v, 0) / values.length;
+}
+
+const STATUSES = ["accepted", "rejected", "cancelled", "deleted"];
 
 const command: ClientSlash = {
   data: new SlashCommandBuilder()
@@ -46,7 +71,6 @@ const command: ClientSlash = {
   exec: async (client: Client, interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
     const days = interaction.options.getInteger("days");
-
     const stats = await getStatRows(days);
 
     if (stats.length === 0) {
@@ -59,56 +83,39 @@ const command: ClientSlash = {
       return;
     }
 
-    // Totals by status
     const totalApplications = stats.length;
-    const accepted = stats.filter((s) => s.status === "accepted").length;
-    const rejected = stats.filter((s) => s.status === "rejected").length;
-    const cancelled = stats.filter((s) => s.status === "cancelled").length;
-    const deleted = stats.filter((s) => s.status === "deleted").length;
+    const statusCounts = countByStatus(stats, STATUSES);
+    const getCount = (status: string) => statusCounts[status] || 0;
+    const accepted = getCount("accepted");
+    const rejected = getCount("rejected");
+    const cancelled = getCount("cancelled");
+    const deleted = getCount("deleted");
 
-    // Percentages
     const pct = (n: number) => ((n / totalApplications) * 100).toFixed(0);
 
-    // Ages
-    const ageValues = stats.filter((s) => s.age != null).map((s) => s.age!);
-    const averageAge =
-      ageValues.length > 0
-        ? ageValues.reduce((a, b) => a + b, 0) / ageValues.length
-        : 0;
-    const formattedAverageAge = averageAge.toFixed(0);
-    const ageDistribution = calculateAgeDistribution(ageValues);
+    const ageVals = extractValues(stats, "age");
+    const averageAge = computeAverage(ageVals).toFixed(0);
+    const ageDistribution = calculateAgeDistribution(ageVals);
 
-    // Kills
-    const killValues = stats
-      .filter((s) => s.kill_count != null)
-      .map((s) => s.kill_count!);
-    const averageKills =
-      killValues.length > 0
-        ? killValues.reduce((a, b) => a + b, 0) / killValues.length
-        : 0;
-    const formattedAverageKills = averageKills.toFixed(0);
+    const killVals = extractValues(stats, "kill_count");
+    const averageKills = computeAverage(killVals).toFixed(0);
 
-    // Wins
-    const winValues = stats
-      .filter((s) => s.win_count != null)
-      .map((s) => s.win_count!);
-    const averageWins =
-      winValues.length > 0
-        ? winValues.reduce((a, b) => a + b, 0) / winValues.length
-        : 0;
-    const formattedAverageWins = averageWins.toFixed(0);
+    const winVals = extractValues(stats, "win_count");
+    const averageWins = computeAverage(winVals).toFixed(0);
 
-    // Processing times (ms)
-    const procTimes = stats
-      .filter((s) => s.processing_time != null && s.status !== "cancelled")
+    const procVals = stats
+      .filter(
+        (s) =>
+          s.processing_time != null &&
+          !["cancelled", "deleted"].includes(s.status),
+      )
       .map((s) => s.processing_time!);
-    const { average, median, min, max } = calculateTimeStats(procTimes);
+    const { average, median, min, max } = calculateTimeStats(procVals);
     const formattedAverage = formatDuration(average);
     const formattedMedian = formatDuration(median);
     const formattedMin = formatDuration(min);
     const formattedMax = formatDuration(max);
 
-    // Charts
     const statusChart = await generateChart({
       type: "pie",
       data: {
@@ -145,7 +152,7 @@ const command: ClientSlash = {
     const statsEmbed = new MessageSender(
       null,
       {
-        title: `Application Statistics ${days ? `(Last ${days} days)` : ""}`,
+        title: `Application Statistics ${days ? `(Last ${days} days)` : "(All Time)"}`,
         description: `
 Total Applications: **${totalApplications}**
 Accepted: **${accepted}** (${pct(accepted)}%)
@@ -153,9 +160,9 @@ Rejected: **${rejected}** (${pct(rejected)}%)
 Cancelled: **${cancelled}** (${pct(cancelled)}%)
 Deleted: **${deleted}** (${pct(deleted)}%)
 
-Average Age: **${formattedAverageAge}**
-Average Kills: **${formattedAverageKills}**
-Average Wins: **${formattedAverageWins}**
+Average Age: **${averageAge}**
+Average Kills: **${averageKills}**
+Average Wins: **${averageWins}**
 
 Processing Time:
 • Average: **${formattedAverage}**
@@ -186,8 +193,7 @@ Processing Time:
   },
   options: {
     isDisabled: false,
-    onlyBotChannel: false,
-    allowStaff: true,
+    onlyBotChannel: true,
     allowEveryone: true,
   },
 };
