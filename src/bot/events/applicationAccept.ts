@@ -116,8 +116,6 @@ async function updateNickname(
     return;
   }
 
-  sendInfo("Nickname will be set to: " + nickname);
-
   await appliedMember
     .setNickname(nickname)
     .then(() => {
