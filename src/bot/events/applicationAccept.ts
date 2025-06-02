@@ -78,11 +78,7 @@ async function updateNickname(
   application: application,
   normalizedName: string,
 ) {
-  const nickname = `${normalizedName} (${application.roblox_user})`;
-  const oldName = appliedMember.displayName;
-
   const sendError = (msg: string) => {
-    Logger.error(msg);
     new MessageSender(
       interaction.channel as SendableChannels,
       {
@@ -92,6 +88,27 @@ async function updateNickname(
     ).sendMessage();
   };
 
+  const sendInfo = (msg: string) => {
+    new MessageSender(
+      interaction.channel as SendableChannels,
+      {
+        description: msg,
+        color: 0xffffff,
+      },
+      { state: EMessageReplyState.none },
+    ).sendMessage();
+  };
+
+  const part1 = normalizedName;
+  const part2 = `(${application.roblox_user})`;
+  const oldName = appliedMember.displayName;
+  let nickname = `${part1} ${part2}`;
+
+  if (part1.toLowerCase().endsWith(part2.toLowerCase())) {
+    // If the old name already ends with the Roblox username, we only need to update the first part
+    nickname = part1;
+  }
+
   if (nickname.length > 32) {
     sendError(
       `Nickname too long for **${appliedMember.user.username}**: ${nickname.length} characters`,
@@ -99,18 +116,13 @@ async function updateNickname(
     return;
   }
 
+  sendInfo("Nickname will be set to: " + nickname);
+
   await appliedMember
     .setNickname(nickname)
     .then(() => {
       if (normalizedName !== oldName) {
-        new MessageSender(
-          interaction.channel as SendableChannels,
-          {
-            description: `Normalized name for **${oldName}** to **${normalizedName}**`,
-            color: 0xffffff,
-          },
-          { state: EMessageReplyState.none },
-        ).sendMessage();
+        sendInfo(`Normalized name for **${oldName}** to **${normalizedName}**`);
       }
     })
     .catch((err) => {
