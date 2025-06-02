@@ -11,6 +11,10 @@ export function normalizeString(str: string): string {
       continue;
     }
 
+    if (/\p{Mark}/u.test(char)) {
+      continue;
+    }
+
     if (/^[\x00-\x7F]$/.test(char) && !/^\d$/.test(char)) {
       result.push(char);
       continue;
