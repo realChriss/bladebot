@@ -31,15 +31,15 @@ export function normalizeString(str: string): string {
 
     const decoded = unidecode(char);
 
-    if (decoded === "[?]" || decoded === "") {
-      result.push(char);
+    if (decoded !== "[?]" && decoded !== "") {
+      result.push(decoded[0]);
       continue;
     }
 
     result.push(decoded);
   }
 
-  return result.join("");
+  return result.join("").trim();
 }
 
 export function buildMessageUrl(channelId: string, messageId: string): string {
