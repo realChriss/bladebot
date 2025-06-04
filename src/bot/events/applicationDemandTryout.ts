@@ -10,7 +10,8 @@ import { env } from "../../env";
 import prisma from "../../db/prisma";
 import { buildMessageUrl } from "../../utils/stringUtils";
 
-type Regions = Record<string, { name: string; tryouterRoleId: string }>;
+type RegionInfo = { name: string; tryouterRoleId: string };
+type Regions = Record<string, RegionInfo>;
 
 const regions: Regions = {
   [env.EU_REGION_ROLE!]: {
@@ -79,7 +80,7 @@ const event: ClientEvent = {
       return;
     }
 
-    let userRegion = null;
+    let userRegion: RegionInfo | null = null;
 
     for (const regionRoleId in regions) {
       if (appliedMember.roles.cache.has(regionRoleId)) {
