@@ -133,7 +133,7 @@ const event: ClientEvent = {
       })
       .setTitle("Tryout Request")
       .setDescription(
-        `**${appliedMember.user.username}** needs to be tried out.\nRegion: [${userRegion.name}]\n\n**Tryout Rules:**\n• 1v1 against a tryouter\n• Long distance\n• Best of 5\n• No abilities (equip pulse ${Emoji.pulse})\n\nThe purpose of this tryout is to assess your skill level and gameplay understanding. Winning is not required.\n\n**Requested by:** ${interaction.user.displayName}`,
+        `**${appliedMember.user.username}** needs to be tried out.\nRegion: [${userRegion.name}]\n\n**Tryout Rules:**\n• 1v1 against a tryouter\n• Long distance\n• Best of 5\n• No abilities (equip pulse ${Emoji.pulse})\n\nThe purpose of this tryout is to assess your skill level and gameplay understanding. Winning is not required.`,
       )
       .setThumbnail(application.roblox_headshot_url)
       .setTimestamp();
