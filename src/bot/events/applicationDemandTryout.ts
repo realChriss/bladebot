@@ -4,37 +4,13 @@ import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
 import {
   getAppliedMember,
   getApplication,
+  RegionInfo,
+  getRegionFromRoles,
 } from "../../utils/applicationActionUtils";
 import Emoji from "../assets/emoji";
 import { env } from "../../env";
 import prisma from "../../db/prisma";
 import { buildMessageUrl } from "../../utils/stringUtils";
-
-type RegionInfo = { name: string; tryouterRoleId: string };
-type Regions = Record<string, RegionInfo>;
-
-const regions: Regions = {
-  [env.EU_REGION_ROLE!]: {
-    name: "Europe",
-    tryouterRoleId: env.EU_TRYOUTER_ROLE!,
-  },
-  [env.NA_REGION_ROLE!]: {
-    name: "North America",
-    tryouterRoleId: env.NA_TRYOUTER_ROLE!,
-  },
-  [env.SA_REGION_ROLE!]: {
-    name: "South America",
-    tryouterRoleId: env.SA_TRYOUTER_ROLE!,
-  },
-  [env.ASIA_REGION_ROLE!]: {
-    name: "Asia",
-    tryouterRoleId: env.ASIA_TRYOUTER_ROLE!,
-  },
-  [env.AU_REGION_ROLE!]: {
-    name: "Australia",
-    tryouterRoleId: env.AU_TRYOUTER_ROLE!,
-  },
-};
 
 function getTryoutMsgUrl(msgId: string): string {
   return buildMessageUrl(env.TRYOUT_CHANNEL!, msgId);
@@ -80,14 +56,7 @@ const event: ClientEvent = {
       return;
     }
 
-    let userRegion: RegionInfo | null = null;
-
-    for (const regionRoleId in regions) {
-      if (appliedMember.roles.cache.has(regionRoleId)) {
-        userRegion = regions[regionRoleId];
-        break;
-      }
-    }
+    const userRegion = getRegionFromRoles(appliedMember.roles);
 
     if (!userRegion) {
       const errorEmbed = new MessageSender(

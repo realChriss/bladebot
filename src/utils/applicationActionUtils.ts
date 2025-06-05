@@ -1,7 +1,34 @@
-import { ButtonInteraction, GuildMember } from "discord.js";
+import { ButtonInteraction, GuildMember, GuildMemberRoleManager } from "discord.js";
 import { application } from "@prisma/client";
 import Logger from "./Logger";
 import prisma from "../db/prisma";
+import { env } from "../env";
+
+export type RegionInfo = { name: string; tryouterRoleId: string };
+export type Regions = Record<string, RegionInfo>;
+
+const regions: Regions = {
+  [env.EU_REGION_ROLE!]: {
+    name: "Europe",
+    tryouterRoleId: env.EU_TRYOUTER_ROLE!,
+  },
+  [env.NA_REGION_ROLE!]: {
+    name: "North America",
+    tryouterRoleId: env.NA_TRYOUTER_ROLE!,
+  },
+  [env.SA_REGION_ROLE!]: {
+    name: "South America",
+    tryouterRoleId: env.SA_TRYOUTER_ROLE!,
+  },
+  [env.ASIA_REGION_ROLE!]: {
+    name: "Asia",
+    tryouterRoleId: env.ASIA_TRYOUTER_ROLE!,
+  },
+  [env.AU_REGION_ROLE!]: {
+    name: "Australia",
+    tryouterRoleId: env.AU_TRYOUTER_ROLE!,
+  },
+};
 
 export async function getApplication(
   interaction: ButtonInteraction,
@@ -22,7 +49,9 @@ export async function sendDMWithFallback(
   member: GuildMember,
   embed: TMessageEmbed,
   fallback: () => Promise<void>,
-) {
+): Promise<boolean> {
+  let success = true;
+
   await member.createDM().catch(() => null);
   await member.dmChannel
     ?.send({
@@ -30,7 +59,9 @@ export async function sendDMWithFallback(
     })
     .catch(async () => {
       await fallback();
+      success = false;
     });
+  return success;
 }
 
 export async function updateOriginalEmbed(
@@ -68,4 +99,13 @@ export async function getAppliedMember(
     return null;
   }
   return member;
+}
+
+export function getRegionFromRoles(roles: GuildMemberRoleManager): RegionInfo | null {
+  for (const regionRoleId in regions) {
+    if (roles.cache.has(regionRoleId)) {
+      return regions[regionRoleId];
+    }
+  }
+  return null;
 }
