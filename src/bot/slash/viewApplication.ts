@@ -1,17 +1,53 @@
 import {
   ChatInputCommandInteraction,
   Client,
+  GuildMember,
   SlashCommandBuilder,
 } from "discord.js";
 import ClientSlash from "../classes/ClientSlash";
 import prisma from "../../db/prisma";
 import MessageSender, { EMessageReplyState } from "../classes/MessageSender";
+import { env } from "../../env";
+import { buildMessageUrl } from "../../utils/stringUtils";
+import { getRegionFromRoles } from "../../utils/applicationActionUtils";
+import { application } from "@prisma/client";
 
 function getAvatar(member: any, size: number) {
   return member.user.displayAvatarURL({
     size: size,
     format: "webp",
   });
+}
+
+function buildDescription(
+  application: application,
+  member: GuildMember,
+): string {
+  const region = getRegionFromRoles(member.roles);
+  let status: string | null = null;
+
+  if (member.roles.cache.has(env.WAITLIST_ROLE!)) {
+    status = "Waitlisted";
+  } else if (member.roles.cache.has(env.TRYOUT_PENDING_ROLE!)) {
+    status = `Tryout Pending ${application.tryout_msg_id ? `[[Jump]](${buildMessageUrl(env.TRYOUT_CHANNEL!, application.tryout_msg_id)})` : ""}`;
+  } else if (application.pending_msg_id) {
+    status = `Pending Invite ${application.pending_msg_id ? `[[Jump]](${buildMessageUrl(env.PENDING_INV_CHANNEL, application.pending_msg_id)})` : ""}`;
+  } else {
+    status = "Processing";
+  }
+
+  let description: string = "";
+  description += `**Roblox User:** ${application.roblox_user || "Not provided"}\n`;
+  description += `**Age:** ${application.age || "Not provided"}\n`;
+  description += `**Kills:** ${application.kill || "Not provided"}\n`;
+  description += `**Wins:** ${application.win || "Not provided"}\n`;
+  description += `**Device:** ${application.device || "Not provided"}\n`;
+  description += `**Region:** ${region?.name || "Not found"}\n`;
+  description += `**Status:** ${status}\n`;
+  description += `**App. Message:** [[Jump]](${buildMessageUrl(env.APPLICATION_CHANNEL, application.msg_id)})\n`;
+  description += `**Created At:** <t:${Math.floor(application.created_at.getTime() / 1000)}:R>\n`;
+
+  return description;
 }
 
 const command: ClientSlash = {
@@ -49,12 +85,16 @@ const command: ClientSlash = {
       return;
     }
 
-    const member = interaction.guild?.members.cache.get(user?.id!);
+    const application = await prisma.application.findFirst({
+      where: user ? { user_id: user.id } : { msg_id: messageId! },
+    });
+
+    const member = interaction.guild?.members.cache.get(application?.user_id!);
     if (!member) {
       const errorEmbed = new MessageSender(
         null,
         {
-          description: "Could not find this user in the server",
+          description: "Could not find this user in the server.",
         },
         { state: EMessageReplyState.error },
       ).getEmbed();
@@ -64,10 +104,6 @@ const command: ClientSlash = {
       });
       return;
     }
-
-    const application = await prisma.application.findFirst({
-      where: user ? { user_id: user.id } : { msg_id: messageId! },
-    });
 
     if (!application) {
       const errorEmbed = new MessageSender(
@@ -92,39 +128,9 @@ const command: ClientSlash = {
         authorName: member.displayName,
         authorImg: getAvatar(member, 128),
         title: "Application Details",
-        fields: [
-          {
-            name: "Roblox User",
-            value: application.roblox_user || "Not provided",
-            inline: true,
-          },
-          {
-            name: "Age",
-            value: application.age?.toString() || "Not provided",
-            inline: true,
-          },
-          {
-            name: "Kills",
-            value: application.kill?.toString() || "Not provided",
-            inline: true,
-          },
-          {
-            name: "Wins",
-            value: application.win?.toString() || "Not provided",
-            inline: true,
-          },
-          {
-            name: "Status",
-            value: application.pending_msg_id ? "Pending Invite" : "Processing",
-            inline: true,
-          },
-          {
-            name: "Created At",
-            value: `<t:${Math.floor(application.created_at.getTime() / 1000)}:R>`,
-            inline: true,
-          },
-        ],
+        description: buildDescription(application, member),
         image: application.roblox_avatar_url || undefined,
+        thumbnail: application.roblox_headshot_url || undefined,
         footerText: interaction.user.username,
         color: 0xffffff,
       },
