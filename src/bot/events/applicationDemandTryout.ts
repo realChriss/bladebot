@@ -38,7 +38,7 @@ const event: ClientEvent = {
       return;
     }
 
-    if (appliedMember.roles.cache.has(env.TRYOUT_PENDING_ROLE!)) {
+    if (appliedMember.roles.cache.has(env.TRYOUT_PENDING_ROLE!) && application.tryout_msg_id) {
       const alreadyInQueueEmbed = new MessageSender(
         null,
         {
