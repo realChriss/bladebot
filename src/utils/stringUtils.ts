@@ -7,16 +7,16 @@ export function normalizeString(str: string): string {
   const result = [];
 
   for (const char of chars) {
+    if (/^[\x00-\x7F]$/.test(char) || /^\d$/.test(char)) {
+      result.push(char);
+      continue;
+    }
+
     if (/\p{Emoji}/u.test(char)) {
       continue;
     }
 
     if (/\p{Mark}/u.test(char)) {
-      continue;
-    }
-
-    if (/^[\x00-\x7F]$/.test(char) && !/^\d$/.test(char)) {
-      result.push(char);
       continue;
     }
 
