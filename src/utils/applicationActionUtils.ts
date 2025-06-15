@@ -1,4 +1,8 @@
-import { ButtonInteraction, GuildMember, GuildMemberRoleManager } from "discord.js";
+import {
+  ButtonInteraction,
+  GuildMember,
+  GuildMemberRoleManager,
+} from "discord.js";
 import { application } from "@prisma/client";
 import Logger from "./Logger";
 import prisma from "../db/prisma";
@@ -101,7 +105,9 @@ export async function getAppliedMember(
   return member;
 }
 
-export function getRegionFromRoles(roles: GuildMemberRoleManager): RegionInfo | null {
+export function getRegionFromRoles(
+  roles: GuildMemberRoleManager,
+): RegionInfo | null {
   for (const regionRoleId in regions) {
     if (roles.cache.has(regionRoleId)) {
       return regions[regionRoleId];
