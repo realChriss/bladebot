@@ -1,4 +1,4 @@
-const Emoji: Record<string, string> = {
+const Emoji = {
   pulse: "<:pulse:1357283254100688947>",
   waitlist: "<:waitlist:1360251417423777824>",
   tryout: "<:tryout:1375487628207718480>",

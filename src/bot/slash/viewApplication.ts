@@ -11,6 +11,7 @@ import { env } from "../../env";
 import { buildMessageUrl } from "../../utils/stringUtils";
 import { getRegionFromRoles } from "../../utils/applicationActionUtils";
 import { application } from "@prisma/client";
+import Emoji from "../assets/emoji";
 
 function getAvatar(member: any, size: number) {
   return member.user.displayAvatarURL({
@@ -27,11 +28,11 @@ function buildDescription(
   let status: string | null = null;
 
   if (member.roles.cache.has(env.WAITLIST_ROLE!)) {
-    status = "Waitlisted";
+    status = `Waitlisted ${Emoji.waitlist}`;
   } else if (member.roles.cache.has(env.TRYOUT_PENDING_ROLE!)) {
-    status = `Tryout Pending ${application.tryout_msg_id ? `[[Jump]](${buildMessageUrl(env.TRYOUT_CHANNEL!, application.tryout_msg_id)})` : ""}`;
+    status = `Tryout Pending ${application.tryout_msg_id ? `[[Jump]](${buildMessageUrl(env.TRYOUT_CHANNEL!, application.tryout_msg_id)})` : ""} ${Emoji.tryout}`;
   } else if (application.pending_msg_id) {
-    status = `Pending Invite ${application.pending_msg_id ? `[[Jump]](${buildMessageUrl(env.PENDING_INV_CHANNEL, application.pending_msg_id)})` : ""}`;
+    status = `Pending Invite ${application.pending_msg_id ? `[[Jump]](${buildMessageUrl(env.PENDING_INV_CHANNEL, application.pending_msg_id)})` : ""} ${Emoji.invite}`;
   } else {
     status = "Processing";
   }
