@@ -5,35 +5,41 @@
   "scripts": {
     "dev": "npx ts-node src/index.ts",
     "prod": "STATE=\"prod\" npx ts-node src/index.ts",
-    "build": "esbuild \"src/**/*\" --outdir=dist --platform=node --target=node14 --format=cjs",
+    "build": "esbuild \"src/**/*\" --outdir=dist --platform=node --target=node14 --format=cjs && esbuild prisma/seed.ts --outfile=prisma/seed.js --platform=node --target=node14 --format=cjs",
     "pretty": "prettier --write .",
     "test": "npx tsc --noEmit",
-    "db-push": "prisma db push"
+    "db-push": "prisma db push",
+    "db-seed": "prisma db seed",
+    "db-gen": "prisma generate",
+    "update-deps": "npm-check-updates -u && npm i"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.70",
-    "@prisma/client": "^5.22.0",
-    "axios": "^1.7.7",
-    "chart.js": "^4.4.9",
+    "@napi-rs/canvas": "^0.1.71",
+    "@prisma/client": "^6.10.1",
+    "axios": "^1.10.0",
+    "chart.js": "^4.5.0",
     "chartjs-node-canvas": "^5.0.0",
-    "discord.js": "^14.16.3",
-    "dotenv": "^16.4.5",
+    "discord.js": "^14.20.0",
+    "dotenv": "^16.5.0",
     "easy-table": "^1.2.0",
-    "moment-timezone": "^0.5.46",
-    "pg": "^8.13.3",
-    "prettier": "^3.5.0",
-    "prisma": "^5.22.0",
+    "moment-timezone": "^0.6.0",
+    "pg": "^8.16.1",
+    "prettier": "^3.5.3",
     "unidecode": "^1.1.0",
-    "zod": "^3.24.4"
+    "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@types/chart.js": "^2.9.41",
-    "@types/node": "^22.8.6",
+    "@types/node": "^24.0.3",
     "@types/unidecode": "^1.1.0",
-    "esbuild": "^0.25.0",
-    "typescript": "^5.6.3"
+    "esbuild": "^0.25.5",
+    "npm-check-updates": "^18.0.1",
+    "prisma": "^6.10.1",
+    "typescript": "^5.8.3"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }
