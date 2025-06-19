@@ -42,7 +42,7 @@ model user_warn {
   issuer_id      String       @db.VarChar 
   requirement    Int
   earned         Int
-  diff           Int?      
+  diff           Int      
   created_at     DateTime   @default(now()) @db.Timestamp
   warn_type      warn_type  @relation(fields: [warn_type_id], references: [id])
   warn_type_id   Int

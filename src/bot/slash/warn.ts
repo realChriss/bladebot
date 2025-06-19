@@ -109,6 +109,7 @@ async function createAndNotifyWarn(
       issuer_id: interaction.member?.user.id!,
       requirement: requirement,
       earned: earned,
+      diff: requirement - earned,
       warn_type_id: config.warnTypeId,
     },
   });
