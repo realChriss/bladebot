@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
@@ -9,13 +9,13 @@ async function main() {
       {
         id: 1,
         name: "ap",
-        description: "Activity Points related warning"
+        description: "Activity Points related warning",
       },
       {
         id: 2,
         name: "donation",
-        description: "Donation related warning"
-      }
+        description: "Donation related warning",
+      },
     ],
   });
 
@@ -25,7 +25,7 @@ async function main() {
     create: {
       id: 1,
       app_open: true,
-      send_wlc_msg: true
+      send_wlc_msg: true,
     },
   });
 }
